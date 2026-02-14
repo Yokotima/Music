@@ -1,4 +1,4 @@
-# HarmonyStudio 🎵
+# HarmonyStudio 
 
 > A Digital Audio Workstation (DAW) for Linux, built in Rust
 
@@ -6,7 +6,7 @@
 
 ---
 
-## 📖 What is HarmonyStudio?
+## What is HarmonyStudio?
 
 HarmonyStudio is a **music production software** designed specifically for Linux. It allows users to:
 
@@ -24,7 +24,7 @@ Think of it as a simplified version of professional DAWs like FL Studio or Ablet
 
 ---
 
-## 🎯 Project Goals
+## Project Goals
 
 This project demonstrates:
 
@@ -38,7 +38,7 @@ This project demonstrates:
 
 ---
 
-## 👥 Team
+## Team
 
 | Member | Role | Responsibility |
 |--------|------|----------------|
@@ -142,8 +142,6 @@ harmonystudio/
 - User documentation
 
 **Current Progress:** ~30% complete
-
-See [`docs/ROADMAP.md`](docs/ROADMAP.md) for detailed timeline.
 
 ---
 
