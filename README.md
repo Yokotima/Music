@@ -44,8 +44,8 @@ This project demonstrates:
 |--------|------|----------------|
 | **Alexandre d'AVEZAC de CASTERA** | Audio Engineer | DSP algorithms, synthesis, effects, polyphony |
 | **Léa-Angélina KOLMERSCHLAG** | UI Developer | User interface, timeline editor, visualizations |
-| **Hugo GUYENNET** | Sequencer Developer | Event management, timing, transport controls |
-| **Quentin JOLY** | File Manager | MP3 encoding/decoding, project persistence |
+| **Hugo GUYENNET** | File Manager | MP3 encoding/decoding, project persistence |
+| **Quentin JOLY** | Sequencer Developer | Event management, timing, transport controls |
 
 ---
 
