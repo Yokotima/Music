@@ -1,0 +1,46 @@
+# Rust
+/target/
+Cargo.lock
+**/*.rs.bk
+*.pdb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+*.o
+*.so
+*.dylib
+*.dll
+
+# Testing
+*.profraw
+*.profdata
+
+# Audio files (temporary)
+*.mp3
+*.wav
+*.ogg
+!assets/**/*.mp3
+!assets/**/*.wav
+
+# Project files (temporary)
+*.hsp
+!examples/**/*.hsp
+
+# Documentation
+/target/doc/
+
+# Backup files
+*.bak
+*.tmp
+
+# OS
+Thumbs.db
+.Spotlight-V100
+.Trashes
