@@ -184,5 +184,5 @@ The above copyright notice and this permission notice shall be included in all c
 
 <p align="center">
   <strong>Built with 🦀 Rust & ❤️ for Linux</strong><br>
-  <sub>EPITA S4 Project 2024-2025</sub>
+  <sub>EPITA S4 Project 2025-2026</sub>
 </p>
