@@ -2,7 +2,7 @@
 
 > A Digital Audio Workstation (DAW) for Linux, built in Rust
 
-**EPITA S4 Project - Academic Year 2025-2026**
+**EPITA S4 Project - Academic Year 2026**
 
 ---
 
@@ -184,5 +184,5 @@ The above copyright notice and this permission notice shall be included in all c
 
 <p align="center">
   <strong>Built with 🦀 Rust & ❤️ for Linux</strong><br>
-  <sub>EPITA S4 Project 2025-2026</sub>
+  <sub>EPITA S4 Project 2026</sub>
 </p>
