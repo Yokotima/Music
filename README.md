@@ -2,7 +2,7 @@
 
 > A Digital Audio Workstation (DAW) for Linux, built in Rust
 
-**EPITA S4 Project - Academic Year 2024-2025**
+**EPITA S4 Project - Academic Year 2025-2026**
 
 ---
 
@@ -163,14 +163,14 @@ harmonystudio/
 
 This project uses a **dual licensing model**:
 
-### During Academic Period (January 2025 - June 2025)
+### During Academic Period (January 2026 - June 2026)
 **All Rights Reserved - Academic Use Only**
 
 This is a student project for EPITA S4 curriculum. During the academic evaluation period:
 - Permitted: Faculty review, team development, portfolio inclusion
 - Prohibited: Copying for other academic submissions (plagiarism), commercial use, public redistribution
 
-### After Academic Period (After June 30, 2025)
+### After Academic Period (After June 30, 2026)
 **MIT License**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
