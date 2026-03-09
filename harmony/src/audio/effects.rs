@@ -34,6 +34,7 @@ struct CircularBuffer
 
 impl CircularBuffer
 {
+    // Takes a size in samples. Returns a circular buffer filled with silence.
     fn new(size_samples: usize) -> Self
     {
         Self
@@ -44,6 +45,7 @@ impl CircularBuffer
         }
     }
 
+    // Takes one audio sample. Writes it at the current head position and advances the head.
     #[inline(always)]
     fn write(&mut self, sample: f32)
     {
@@ -51,6 +53,7 @@ impl CircularBuffer
         self.write_head = (self.write_head + 1) % self.len;
     }
 
+    // Takes a delay in samples. Returns the sample that was written that many samples ago.
     #[inline(always)]
     fn read(&self, delay: usize) -> f32
     {
@@ -72,6 +75,7 @@ pub struct Delay
 
 impl Delay
 {
+    // Takes delay time (ms), feedback, wet mix and sample rate. Returns a configured delay effect.
     pub fn new(delay_ms: f32, feedback: f32, wet_mix: f32, sample_rate: u32) -> Self
     {
         let delay_samples = ((delay_ms / 1000.0) * sample_rate as f32) as usize;
@@ -86,22 +90,26 @@ impl Delay
         }
     }
 
+    // Takes a delay time in ms. Updates how far back in time the echo reads.
     pub fn set_delay_ms(&mut self, delay_ms: f32, sample_rate: u32)
     {
         self.delay_samples = ((delay_ms / 1000.0) * sample_rate as f32) as usize;
         self.delay_samples = self.delay_samples.clamp(1, MAX_DELAY_SAMPLES);
     }
 
+    // Takes a feedback value [0.0-0.95]. Controls how many echoes repeat before fading.
     pub fn set_feedback(&mut self, feedback: f32)
     {
         self.feedback = feedback.clamp(0.0, 0.95);
     }
 
+    // Takes a wet mix [0.0-1.0]. Controls how loud the echoes are in the output.
     pub fn set_wet_mix(&mut self, wet: f32)
     {
         self.wet_mix = wet.clamp(0.0, 1.0);
     }
 
+    // Takes one dry audio sample. Returns it blended with its delayed echo.
     #[inline(always)]
     pub fn process(&mut self, input: f32) -> f32
     {
@@ -132,6 +140,7 @@ struct CombFilter
 
 impl CombFilter
 {
+    // Takes delay length and feedback. Returns a comb filter simulating one reflection path.
     fn new(delay_samples: usize, feedback: f32) -> Self
     {
         Self
@@ -142,6 +151,7 @@ impl CombFilter
         }
     }
 
+    // Takes one audio sample. Returns it added to its delayed self — creates a repeating echo.
     #[inline(always)]
     fn process(&mut self, input: f32) -> f32
     {
@@ -161,6 +171,7 @@ struct AllPassFilter
 
 impl AllPassFilter
 {
+    // Takes delay length and feedback. Returns an all-pass filter for echo diffusion.
     fn new(delay_samples: usize, feedback: f32) -> Self
     {
         Self
@@ -171,6 +182,7 @@ impl AllPassFilter
         }
     }
 
+    // Takes one audio sample. Returns it phase-shifted — smooths echo density into a reverb tail.
     #[inline(always)]
     fn process(&mut self, input: f32) -> f32
     {
@@ -191,6 +203,7 @@ pub struct Reverb
 
 impl Reverb
 {
+    // Takes room size [0.0-0.98] and wet mix [0.0-1.0]. Returns a configured Schroeder reverb.
     pub fn new(room_size: f32, wet_mix: f32) -> Self
     {
         let room_size = room_size.clamp(0.0, 0.98);
@@ -213,6 +226,7 @@ impl Reverb
         }
     }
 
+    // Takes a room size [0.0-0.98]. Updates the reverb tail length on all comb filters.
     pub fn set_room_size(&mut self, room_size: f32)
     {
         self.room_size = room_size.clamp(0.0, 0.98);
@@ -222,11 +236,13 @@ impl Reverb
         }
     }
 
+    // Takes a wet mix [0.0-1.0]. Controls how loud the reverb tail is in the output.
     pub fn set_wet_mix(&mut self, wet: f32)
     {
         self.wet_mix = wet.clamp(0.0, 1.0);
     }
 
+    // Takes one dry audio sample. Returns it blended with the full Schroeder reverb tail.
     #[inline(always)]
     pub fn process(&mut self, input: f32) -> f32
     {
@@ -257,6 +273,7 @@ pub struct EffectsChain
 
 impl EffectsChain
 {
+    // Takes a sample rate. Returns a default effects chain with delay (375ms) and reverb (0.75).
     pub fn new(sample_rate: u32) -> Self
     {
         Self
@@ -266,6 +283,7 @@ impl EffectsChain
         }
     }
 
+    // Takes a sample rate. Returns a completely dry chain — no delay, no reverb.
     pub fn dry(sample_rate: u32) -> Self
     {
         Self
@@ -275,6 +293,7 @@ impl EffectsChain
         }
     }
 
+    // Takes one audio sample. Runs it through Delay then Reverb. Returns the processed sample.
     #[inline(always)]
     pub fn process(&mut self, input: f32) -> f32
     {

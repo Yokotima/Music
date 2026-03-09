@@ -32,6 +32,8 @@ pub enum Waveform
 }
 
 //==========PolyBLEP correction function==========
+// Takes a phase position and phase increment, returns a small correction value
+// to smooth the discontinuity of a waveform and remove aliasing artifacts.
 #[inline(always)]
 fn poly_blep(phase: f32, dt: f32) -> f32
 {
@@ -63,6 +65,8 @@ pub struct Oscillator
 
 impl Oscillator
 {
+    // Takes a frequency in Hz, a sample rate, and a waveform shape.
+    // Returns a new oscillator ready to generate audio samples.
     pub fn new(frequency_hz: f32, sample_rate: u32, waveform: Waveform) -> Self
     {
         Self
@@ -75,17 +79,23 @@ impl Oscillator
         }
     }
 
+    // Takes a new frequency in Hz.
+    // Updates the pitch of the oscillator without resetting the phase (no click).
     pub fn set_frequency(&mut self, frequency_hz: f32)
     {
         self.phase_increment = frequency_hz / (self.sample_rate) as f32;
     }
 
+    // Takes a new waveform shape (Sine / Sawtooth / Square / Triangle).
+    // Switches the output shape and resets the triangle integrator to avoid a pop.
     pub fn set_waveform(&mut self, waveform: Waveform)
     {
         self.waveform = waveform;
         self.last_triangle = 0.0;
     }
 
+    // Takes nothing. Advances the phase and returns one audio sample [-1.0, 1.0].
+    // This is called 44100 times per second. Routes to the correct waveform generator.
     #[inline(always)]
     pub fn next_sample(&mut self) -> f32
     {
@@ -107,12 +117,15 @@ impl Oscillator
 
     //==========Waveform generators==========
 
+    // Takes nothing. Returns a pure sine wave sample. No aliasing correction needed.
     #[inline(always)]
     fn next_sine(&self) -> f32
     {
         (self.phase * TAU).sin()
     }
 
+    // Takes nothing. Returns a band-limited sawtooth sample.
+    // Applies one PolyBLEP correction at the reset point to remove aliasing.
     #[inline(always)]
     fn next_saw(&self) -> f32
     {
@@ -120,6 +133,8 @@ impl Oscillator
         naive - poly_blep(self.phase, self.phase_increment)
     }
 
+    // Takes nothing. Returns a band-limited square wave sample.
+    // Applies two PolyBLEP corrections: one at the rising edge, one at the falling edge.
     #[inline(always)]
     fn next_square(&self) -> f32
     {
@@ -141,6 +156,8 @@ impl Oscillator
         naive + correction_rise - correction_fall
     }
 
+    // Takes nothing. Returns a triangle wave sample.
+    // Integrates the square wave output — naturally produces a smooth triangle shape.
     #[inline(always)]
     fn next_triangle(&mut self) -> f32
     {

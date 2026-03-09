@@ -32,19 +32,10 @@
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum FilterType {
-    /// Low-pass: attenuates frequencies above cutoff.
-    /// Use for: softening bright sounds, bass instruments
     LowPass,
-    /// High-pass: attenuates frequencies below cutoff.
-    /// Use for: removing rumble, thinning out bass
     HighPass,
-    /// Band-pass: passes only a band around cutoff.
-    /// Use for: formant-like effects, wah pedal
     BandPass,
-    /// Notch (band-reject): removes a narrow band.
-    /// Use for: removing specific frequencies
     Notch,
-    /// Bypass: no filtering applied (identity).
     Bypass,
 }
 
@@ -60,6 +51,7 @@ struct BiquadCoeffs {
 
 impl BiquadCoeffs {
     /// Identity (bypass) coefficients: output = input
+    // Takes nothing. Returns coefficients that pass the signal through unchanged.
     fn bypass() -> Self {
         Self { b0: 1.0, b1: 0.0, b2: 0.0, a1: 0.0, a2: 0.0 }
     }
@@ -74,6 +66,7 @@ impl BiquadCoeffs {
     /// * `cutoff_hz`    — cutoff / center frequency in Hz
     /// * `q`            — quality factor (resonance). 0.707 = Butterworth (flat)
     /// * `sample_rate`  — audio sample rate in Hz
+    // Takes filter type, cutoff frequency and Q. Returns the 5 biquad coefficients for that shape.
     fn compute(filter_type: FilterType, cutoff_hz: f32, q: f32, sample_rate: u32) -> Self {
         if filter_type == FilterType::Bypass {
             return Self::bypass();
@@ -144,6 +137,7 @@ impl BiquadCoeffs {
 
     /// Linear interpolation between two coefficient sets.
     /// Used for smooth parameter transitions (avoids clicks).
+    // Takes another coefficient set and a blend factor t [0.0-1.0]. Returns the interpolated set.
     fn lerp(self, other: Self, t: f32) -> Self {
         Self {
             b0: self.b0 + (other.b0 - self.b0) * t,
@@ -187,6 +181,7 @@ pub struct BiquadFilter {
 }
 
 impl BiquadFilter {
+    // Takes a sample rate. Returns a new filter in bypass mode (signal passes through unchanged).
     pub fn new(sample_rate: u32) -> Self {
         let bypass = BiquadCoeffs::bypass();
         Self {
@@ -206,6 +201,7 @@ impl BiquadFilter {
     ///
     /// Safe to call from the audio callback — no allocation, no branching
     /// other than a few comparisons.
+    // Takes filter type, cutoff Hz and Q. Updates the filter smoothly over 64 samples (no click).
     pub fn set_params(&mut self, filter_type: FilterType, cutoff_hz: f32, q: f32) {
         // Skip recomputation if nothing changed
         if filter_type == self.filter_type
@@ -233,6 +229,7 @@ impl BiquadFilter {
     ///
     /// Direct Form I is preferred over Form II here because it has
     /// better numerical behaviour when coefficients change mid-stream.
+    // Takes one raw audio sample. Returns that sample with the filter applied.
     #[inline(always)]
     pub fn process(&mut self, x: f32) -> f32 {
         // Advance coefficient interpolation if active
@@ -266,6 +263,7 @@ impl BiquadFilter {
 
     /// Reset the filter state (delay lines).
     /// Call this when a voice is re-triggered to avoid residual noise.
+    // Takes nothing. Clears the internal memory — call on note_on to avoid leftover noise.
     pub fn reset(&mut self) {
         self.x1 = 0.0;
         self.x2 = 0.0;
@@ -288,31 +286,37 @@ pub struct FilterPreset {
 
 impl FilterPreset {
     /// No filtering — pass signal through unchanged.
+    // Takes nothing. Returns a bypass preset — the signal is not filtered at all.
     pub fn bypass() -> Self {
         Self { filter_type: FilterType::Bypass, cutoff_hz: 20_000.0, q: 0.707 }
     }
 
     /// Piano: gentle high-cut to tame harsh upper harmonics.
+    // Takes nothing. Returns a gentle low-pass at 4kHz for a natural piano tone.
     pub fn piano() -> Self {
         Self { filter_type: FilterType::LowPass, cutoff_hz: 4_000.0, q: 0.707 }
     }
 
     /// Flute: soft low-pass for breathy, airy tone.
+    // Takes nothing. Returns a soft low-pass at 2.5kHz for a breathy flute tone.
     pub fn flute() -> Self {
         Self { filter_type: FilterType::LowPass, cutoff_hz: 2_500.0, q: 0.6 }
     }
 
     /// Bass: low-pass to keep only low-end fundamentals.
+    // Takes nothing. Returns a heavy low-pass at 800Hz — keeps only the deep bass frequencies.
     pub fn bass() -> Self {
         Self { filter_type: FilterType::LowPass, cutoff_hz: 800.0, q: 1.2 }
     }
 
     /// Pad: warm low-pass with slight resonance for character.
+    // Takes nothing. Returns a warm low-pass at 1.2kHz with light resonance for pad texture.
     pub fn pad() -> Self {
         Self { filter_type: FilterType::LowPass, cutoff_hz: 1_200.0, q: 1.5 }
     }
 
     /// Lead synth: resonant filter for classic synth character.
+    // Takes nothing. Returns a resonant low-pass at 3kHz — gives the synth lead its bite.
     pub fn lead() -> Self {
         Self { filter_type: FilterType::LowPass, cutoff_hz: 3_000.0, q: 3.0 }
     }

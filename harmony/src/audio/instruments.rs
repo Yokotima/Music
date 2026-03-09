@@ -35,6 +35,7 @@ pub enum InstrumentKind
 
 impl InstrumentKind
 {
+    // Takes nothing. Returns the instrument name as a string for display or logging.
     pub fn name(&self) -> &'static str
     {
         match self
@@ -48,6 +49,7 @@ impl InstrumentKind
     }
 
     //All instruments in order for test or demo
+    // Takes nothing. Returns all five instrument kinds in order — useful for cycling demos.
     pub fn all() -> [InstrumentKind; 5]
     {
         [Self::Piano, Self::Flute, Self::Bass, Self::Pad, Self::Lead]
@@ -67,6 +69,7 @@ pub struct EffectConfig
 
 impl EffectConfig
 {
+    // Takes nothing. Returns a dry config — no delay, no reverb. Used for Piano and Bass.
     pub fn none() -> Self
     {
         Self
@@ -94,6 +97,7 @@ pub struct Instrument
 impl Instrument 
 {
     //==========Piano========== 
+    // Takes nothing. Returns the Piano instrument bundle: Triangle wave, fast attack, long decay, no effects.
     pub fn piano() -> Self 
     {
         Self 
@@ -112,6 +116,7 @@ impl Instrument
         }
     }
     //==========Flute==========
+    // Takes nothing. Returns the Flute instrument bundle: Sine wave, slow attack, light reverb.
     pub fn flute() -> Self 
     {
         Self
@@ -137,6 +142,7 @@ impl Instrument
         }
     }
     //==========Bass==========
+    // Takes nothing. Returns the Bass instrument bundle: Sawtooth wave, heavy LP filter, no effects.
     pub fn bass() -> Self
     {
         Self
@@ -155,6 +161,7 @@ impl Instrument
     }
 
     //==========Pad==========
+    // Takes nothing. Returns the Pad instrument bundle: Sawtooth wave, slow attack, heavy reverb.
     pub fn pad() -> Self
     {
         Self
@@ -180,6 +187,7 @@ impl Instrument
         }
     }
     //==========Lead==========
+    // Takes nothing. Returns the Lead instrument bundle: Square wave, resonant filter, medium delay.
     pub fn lead() -> Self
     {
         Self
@@ -205,7 +213,7 @@ impl Instrument
         }
     }
 
-    //Order by Kind
+    // Takes an InstrumentKind. Returns the matching Instrument bundle.
     pub fn get(kind: InstrumentKind) -> Self
     {
         match kind
@@ -230,6 +238,7 @@ pub struct InstrumentEngine
 
 impl InstrumentEngine
 {
+    // Takes an instrument kind and sample rate. Returns a fully configured engine ready to play.
     pub fn new(kind: InstrumentKind, sample_rate: u32) -> Self
     {
         let inst = Instrument::get(kind);
@@ -248,8 +257,7 @@ impl InstrumentEngine
         }
     }
 
-    //Switch to a different instrument
-    //Releases all active voices first
+    // Takes an instrument kind. Rebuilds the voice pool and effects chain for the new instrument.
     pub fn set_instrument(&mut self, kind: InstrumentKind)
     {
         let inst = Instrument::get(kind);
@@ -260,7 +268,8 @@ impl InstrumentEngine
         println!("[instrument] Switched to: {}", kind.name());
     }
 
-    //Process one sample: sum voices → apply effects → return output
+    // Takes nothing. Returns one audio sample: voices summed, then delay and reverb applied.
+    // This is THE function that produces all sound — call it 44100 times per second.
     #[inline(always)]
     pub fn next_sample(&mut self) -> f32
     {
@@ -268,6 +277,7 @@ impl InstrumentEngine
         self.fx.process(dry)
     }
 
+    // Takes an EffectConfig and sample rate. Returns a configured EffectsChain for that instrument.
     fn build_fx(cfg: &EffectConfig, sample_rate: u32) -> EffectsChain
     {
         use super::effects::{Delay, Reverb};

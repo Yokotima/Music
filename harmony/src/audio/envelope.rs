@@ -97,6 +97,7 @@ pub struct Envelope
 
 impl Envelope
 {
+    // Takes a sample rate. Returns a silent envelope in Idle state, ready to be triggered.
     pub fn new(sample_rate: u32) -> Self
     {
         Self
@@ -112,12 +113,15 @@ impl Envelope
     }
 
     //==========Coefficient calculation==========
+    // Takes a time in seconds. Returns the exponential curve coefficient for that duration.
+    // Close to 1.0 = slow curve. Close to 0.0 = fast curve.
     fn make_coeff(time_secs: f32, sample_rate: u32) -> f32
     {
         let time_secs = time_secs.max(0.0001); //minimum 0.1 ms
         (-1.0 / (time_secs * sample_rate as f32)).exp()
     }
 
+    // Takes ADSR params. Recomputes all three phase coefficients from the given timings.
     fn recompute_coeffs(&mut self, params: &EnvelopeParams)
     {
         self.attack_coeff = Self::make_coeff(params.attack_secs, self.sample_rate);
@@ -126,12 +130,14 @@ impl Envelope
     }
 
     //==========Events==========
+    // Takes ADSR params. Starts the Attack phase — the sound begins rising toward peak.
     pub fn note_on(&mut self, params: &EnvelopeParams)
     {
         self.recompute_coeffs(params);
         self.state = EnvelopeState::Attack;
     }
 
+    // Takes ADSR params. Starts the Release phase — the sound begins fading to silence.
     pub fn note_off(&mut self, params: &EnvelopeParams)
     {
         if self.state != EnvelopeState::Idle
@@ -144,6 +150,8 @@ impl Envelope
 
     //==========Per-sample Processing==========
     //level = target + (level - target) * coeff
+    // Takes ADSR params. Returns the current amplitude [0.0, 1.0] for this sample.
+    // Multiply your oscillator output by this value to shape the volume over time.
     #[inline(always)]
     pub fn next_sample(&mut self, params: &EnvelopeParams) -> f32
     {
@@ -194,16 +202,19 @@ impl Envelope
     }
 
     //==========State queries==========
+    // Takes nothing. Returns true when the envelope is silent — voice can be recycled.
     pub fn is_idle(&self) -> bool
     {
         self.state == EnvelopeState::Idle
     }
 
+    // Takes nothing. Returns the current amplitude level [0.0, 1.0].
     pub fn level(&self) -> f32
     {
         self.level
     }
 
+    // Takes nothing. Returns the current phase (Idle/Attack/Decay/Sustain/Release).
     pub fn state(&self) -> EnvelopeState
     {
         self.state
