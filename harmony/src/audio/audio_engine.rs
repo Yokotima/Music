@@ -1,25 +1,15 @@
-/// audio/audio_engine.rs
-///
-/// "Happy Birthday" — Simple melody demo, ~10 seconds
-/// Key: C major | BPM: 120
-/// One instrument, melody only, no chords, no reverb issues.
+
 
 use anyhow::{anyhow, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{BufferSize, SampleRate, StreamConfig};
 
-use super::instruments::{InstrumentEngine, InstrumentKind};
 
-pub const SAMPLE_RATE: u32 = 44_100;
+use crate::sequencer::sequencer::StepSequencer;
+use super::instruments::InstrumentKind;
+
+pub const SAMPLE_RATE: u32    = 44_100;
 pub const MAX_BUFFER_SIZE: u32 = 1024;
-
-const BPM: f32 = 120.0;
-const BEAT: u32 = (SAMPLE_RATE as f32 * 60.0 / BPM) as u32; // 1 beat = 22050 samples
-
-// beat x100 → samples
-fn s(beat_x100: u32) -> u32 {
-    (beat_x100 as u64 * BEAT as u64 / 100) as u32
-}
 
 pub struct AudioEngine {
     _stream: cpal::Stream,
@@ -47,96 +37,57 @@ impl AudioEngine {
         );
 
         // ══════════════════════════════════════════════════════════════
-        // HAPPY BIRTHDAY — melody only
-        //
-        // C major, 120 BPM
-        // (pitch, start x100, duration x100)
-        // 100 = quarter note | 50 = eighth | 150 = dotted quarter | 200 = half
-        //
-        // MIDI notes:
-        //   C4=60  D4=62  E4=64  F4=65  G4=67  A4=69  Bb4=70  B4=71  C5=72
+        // ② NOUVEAU : construction du séquenceur
+        //    - 120 BPM, grille 16 steps (= 4 mesures de 4 doubles-croches)
         // ══════════════════════════════════════════════════════════════
-        let melody: Vec<(u8, u32, u32)> = vec![
-            // "Hap-py birth-day to you"
-            (60,   0,  75), // C4  Hap-
-            (60,  75,  25), // C4  -py
-            (62, 100, 100), // D4  birth-
-            (60, 200, 100), // C4  -day
-            (65, 300, 100), // F4  to
-            (64, 400, 200), // E4  you
+        let mut seq = StepSequencer::new(120.0, 16, SAMPLE_RATE);
 
-            // "Hap-py birth-day to you"
-            (60, 600,  75), // C4
-            (60, 675,  25), // C4
-            (62, 700, 100), // D4
-            (60, 800, 100), // C4
-            (67, 900, 100), // G4
-            (65,1000, 200), // F4
+        // ── Piste 0 : Bass / kick ──────────────────────────────────
+        // add_track(instrument, note_midi_par_défaut)
+        // 36 = C2, convention kick en MIDI
+        seq.add_track(InstrumentKind::Bass, 36);
+        seq.set_step(0, 0,  true);   // temps 1
+        seq.set_step(0, 4,  true);   // temps 2
+        seq.set_step(0, 8,  true);   // temps 3
+        seq.set_step(0, 12, true);   // temps 4
 
-            // "Hap-py birth-day dear [name]"
-            (60,1200,  75), // C4
-            (60,1275,  25), // C4
-            (72,1300, 100), // C5  — jump up for emotion
-            (69,1400, 100), // A4
-            (65,1500, 100), // F4
-            (64,1600, 100), // E4
-            (62,1700, 200), // D4
+        // ── Piste 1 : Lead / mélodie ───────────────────────────────
+        // set_step_note(piste, step, note) — active le step et lui assigne une note
+        seq.add_track(InstrumentKind::Lead, 60); // C4 par défaut
+        seq.set_step_note(1,  0, 60u8);  // C4
+        seq.set_step_note(1,  2, 62u8);  // D4
+        seq.set_step_note(1,  4, 64u8);  // E4
+        seq.set_step_note(1,  6, 65u8);  // F4
+        seq.set_step_note(1,  8, 67u8);  // G4
+        seq.set_step_note(1, 12, 64u8);  // E4
 
-            // "Hap-py birth-day to you"
-            (70,1900,  75), // Bb4
-            (70,1975,  25), // Bb4
-            (69,2000, 100), // A4
-            (65,2100, 100), // F4
-            (67,2200, 100), // G4
-            (65,2400, 200), // F4  — final note held
-        ];
+        // ── Piste 2 : Pad / harmonie ───────────────────────────────
+        seq.add_track(InstrumentKind::Pad, 60);
+        seq.set_step(2, 0, true);    // note par défaut (C4)
+        seq.set_step(2, 8, true);
 
-        // Build event timeline: (sample, note, is_on)
-        let mut timeline: Vec<(u32, u8, bool)> = Vec::new();
-        for &(pitch, start, dur) in &melody {
-            timeline.push((s(start),       pitch, true));
-            timeline.push((s(start + dur), pitch, false));
-        }
-        timeline.sort_by_key(|e| e.0);
+        // ③ Lancer la lecture
+        seq.play();
 
-        // Total: 2600 x100 beats = 26 quarter notes at 120 BPM ≈ 13 seconds
-        let total_samples = s(2800);
+        println!("[audio] Séquenceur prêt — {} pistes, {} steps à {} BPM",
+            seq.tracks.len(), seq.step_count, seq.bpm());
 
-        let channels       = config.channels as usize;
-        let mut sample_ctr = 0u32;
-        let mut cursor     = 0usize;
-
-        // Piano — simple, clean, no effects overhead
-        let mut piano = InstrumentEngine::new(InstrumentKind::Piano, SAMPLE_RATE);
-        piano.fx.reverb.set_wet_mix(0.0); // dry — no reverb cost at all
-        piano.fx.delay.set_wet_mix(0.0);  // no delay either
-
-        println!("[audio] Playing: Happy Birthday (~13s then loops)");
+        // ④ Le séquenceur est déplacé dans le callback (move)
+        let channels = config.channels as usize;
 
         let stream = device.build_output_stream(
             &config,
             move |output: &mut [f32], _: &cpal::OutputCallbackInfo| {
                 for frame in output.chunks_mut(channels) {
-                    // Past the end — output silence, play once only
-                    if sample_ctr >= total_samples {
-                        for ch in frame.iter_mut() { *ch = 0.0; }
-                        continue;
-                    }
 
-                    // Dispatch events
-                    while cursor < timeline.len() && timeline[cursor].0 <= sample_ctr {
-                        let (_, note, is_on) = timeline[cursor];
-                        if is_on { piano.pool.note_on(note, 0.8); }
-                        else     { piano.pool.note_off(note); }
-                        cursor += 1;
-                    }
+                    // ⑤ UNE seule ligne remplace toute la logique timeline/cursor/piano
+                    //    next_sample() avance l'horloge, déclenche les notes
+                    //    et retourne la somme de toutes les pistes.
+                    let out = seq.next_sample();
 
-                    let out = piano.next_sample();
                     for ch in frame.iter_mut() {
                         *ch = out;
                     }
-
-                    sample_ctr += 1;
                 }
             },
             |err| eprintln!("[audio] Stream error: {err}"),
