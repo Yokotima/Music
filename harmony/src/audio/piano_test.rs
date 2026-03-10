@@ -11,7 +11,8 @@ use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{BufferSize, SampleRate, StreamConfig};
 use std::sync::{Arc, Mutex};
 
-use super::instruments::{InstrumentEngine, InstrumentKind};
+use crate::sequencer::sequencer::StepSequencer;
+use super::instruments::InstrumentKind;
 use super::piano::{play_sound, stop_sound, PianoNote};
 
 // All 88 notes in order A0 → C8
@@ -45,22 +46,23 @@ const ALL_NOTES: [PianoNote; 88] = [
 // run_all_notes — plays every key from A0 to C8
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Plays all 88 piano keys one by one, 0.4s each.
-/// Prints the note name and frequency for each one.
+// Plays all 88 piano keys one by one, 0.4s each.
+// Creates a sequencer with one Piano track — play_sound triggers notes on it.
 pub fn run_all_notes() -> Result<()>
 {
-    let engine = Arc::new(Mutex::new(
-        InstrumentEngine::new(InstrumentKind::Piano, 44_100)
-    ));
+    // Sequencer with 1 step — we don't use the grid here, just the engine inside
+    let seq = Arc::new(Mutex::new(StepSequencer::new(120.0, 1, 44_100)));
 
-    // Dry signal — no effects so every note rings cleanly
+    // Add one Piano track — play_sound will find it automatically
     {
-        let mut e = engine.lock().unwrap();
-        e.fx.reverb.set_wet_mix(0.0);
-        e.fx.delay.set_wet_mix(0.0);
+        let mut s = seq.lock().unwrap();
+        let idx = s.add_track(InstrumentKind::Piano, 60);
+        // Dry — no effects so every note rings cleanly
+        s.tracks[idx].engine.fx.reverb.set_wet_mix(0.0);
+        s.tracks[idx].engine.fx.delay.set_wet_mix(0.0);
     }
 
-    let stream = build_stream(Arc::clone(&engine))?;
+    let stream = build_stream(Arc::clone(&seq))?;
     stream.play()?;
     std::thread::sleep(std::time::Duration::from_millis(100));
 
@@ -69,23 +71,22 @@ pub fn run_all_notes() -> Result<()>
     for &note in &ALL_NOTES
     {
         {
-            let mut e = engine.lock().unwrap();
-            play_sound(note, 0.75, &mut e);
+            let mut s = seq.lock().unwrap();
+            play_sound(note, 0.75, &mut s);
         }
 
         // Hold the note for 300ms
         std::thread::sleep(std::time::Duration::from_millis(300));
 
         {
-            let mut e = engine.lock().unwrap();
-            stop_sound(note, &mut e);
+            let mut s = seq.lock().unwrap();
+            stop_sound(note, &mut s);
         }
 
         // Gap between notes: 100ms
         std::thread::sleep(std::time::Duration::from_millis(100));
     }
 
-    // Wait for last note to finish its release
     std::thread::sleep(std::time::Duration::from_millis(500));
     println!("\nAll notes played.");
 
@@ -96,8 +97,8 @@ pub fn run_all_notes() -> Result<()>
 // run_single_note — plays one note by name
 // ─────────────────────────────────────────────────────────────────────────────
 
-/// Plays one specific note by name for 2 seconds.
-/// Accepts names like: A4, C4, Cs4 (C#4), Fs3 (F#3), etc.
+// Plays one specific note by name for 2 seconds.
+// Accepts names like: A4, C4, Cs4 (C#4), Fs3 (F#3), Bb4, etc.
 pub fn run_single_note(name: &str) -> Result<()>
 {
     let note = parse_note(name)
@@ -106,32 +107,31 @@ pub fn run_single_note(name: &str) -> Result<()>
             name
         ))?;
 
-    let engine = Arc::new(Mutex::new(
-        InstrumentEngine::new(InstrumentKind::Piano, 44_100)
-    ));
+    let seq = Arc::new(Mutex::new(StepSequencer::new(120.0, 1, 44_100)));
 
     {
-        let mut e = engine.lock().unwrap();
-        e.fx.reverb.set_wet_mix(0.0);
-        e.fx.delay.set_wet_mix(0.0);
+        let mut s = seq.lock().unwrap();
+        let idx = s.add_track(InstrumentKind::Piano, note.midi());
+        s.tracks[idx].engine.fx.reverb.set_wet_mix(0.0);
+        s.tracks[idx].engine.fx.delay.set_wet_mix(0.0);
     }
 
-    let stream = build_stream(Arc::clone(&engine))?;
+    let stream = build_stream(Arc::clone(&seq))?;
     stream.play()?;
     std::thread::sleep(std::time::Duration::from_millis(100));
 
     println!("Playing {} ({:.3} Hz) for 2 seconds...", note.name(), note.freq());
 
     {
-        let mut e = engine.lock().unwrap();
-        play_sound(note, 0.8, &mut e);
+        let mut s = seq.lock().unwrap();
+        play_sound(note, 0.8, &mut s);
     }
 
     std::thread::sleep(std::time::Duration::from_millis(2000));
 
     {
-        let mut e = engine.lock().unwrap();
-        stop_sound(note, &mut e);
+        let mut s = seq.lock().unwrap();
+        stop_sound(note, &mut s);
     }
 
     std::thread::sleep(std::time::Duration::from_millis(500));
@@ -197,8 +197,9 @@ fn parse_note(name: &str) -> Option<PianoNote>
     }
 }
 
-// Builds the cpal audio stream with a shared engine behind a Mutex.
-fn build_stream(engine: Arc<Mutex<InstrumentEngine>>) -> Result<cpal::Stream>
+// Builds the cpal audio stream with a shared sequencer behind a Mutex.
+// The sequencer owns the Piano track — next_sample() drives the audio.
+fn build_stream(seq: Arc<Mutex<StepSequencer>>) -> Result<cpal::Stream>
 {
     let host   = cpal::default_host();
     let device = host
@@ -216,10 +217,11 @@ fn build_stream(engine: Arc<Mutex<InstrumentEngine>>) -> Result<cpal::Stream>
         &config,
         move |output: &mut [f32], _: &cpal::OutputCallbackInfo|
         {
-            let mut e = engine.lock().unwrap();
+            let mut s = seq.lock().unwrap();
             for frame in output.chunks_mut(2)
             {
-                let sample = e.next_sample();
+                // next_sample() sums all tracks inside the sequencer
+                let sample = s.next_sample();
                 for ch in frame.iter_mut()
                 {
                     *ch = sample;
@@ -232,3 +234,4 @@ fn build_stream(engine: Arc<Mutex<InstrumentEngine>>) -> Result<cpal::Stream>
 
     Ok(stream)
 }
+

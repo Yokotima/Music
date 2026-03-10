@@ -5,7 +5,8 @@
 ///   play_sound(PianoNote::A4, 0.8, &mut engine);
 ///   stop_sound(PianoNote::A4, &mut engine);
 
-use super::instruments::InstrumentEngine;
+use crate::sequencer::sequencer::StepSequencer;
+use super::instruments::InstrumentKind;
 
 // PianoNote — all 88 keys of a standard piano
 // Naming: Note + Octave. Sharps written as "s" (Cs4 = C#4, Fs3 = F#3).
@@ -326,23 +327,35 @@ impl PianoNote
 
 //==========play_sound / stop_sound==========
 
-/// Takes a PianoNote, a velocity [0.0-1.0] and the engine.
-/// Triggers the note — the engine handles frequency, waveform, filter, envelope.
-///
-///   play_sound(PianoNote::A4,  0.8, &mut engine);  // normal
-///   play_sound(PianoNote::C4,  1.0, &mut engine);  // forte
-///   play_sound(PianoNote::E3,  0.3, &mut engine);  // soft
-pub fn play_sound(note: PianoNote, velocity: f32, engine: &mut InstrumentEngine)
+// Takes a PianoNote, a velocity and the sequencer.
+// Finds the first Piano track and triggers the note on it.
+// If no Piano track exists yet, creates one automatically.
+pub fn play_sound(note: PianoNote, velocity: f32, seq: &mut StepSequencer)
 {
-    engine.pool.note_on(note.midi(), velocity);
+    let idx = seq.tracks
+        .iter()
+        .position(|t| matches!(t.engine.current, InstrumentKind::Piano));
+
+    let idx = match idx
+    {
+        Some(i) => i,
+        None    => seq.add_track(InstrumentKind::Piano, note.midi()),
+    };
+
+    seq.tracks[idx].engine.pool.note_on(note.midi(), velocity);
     println!("[piano] ON  {} ({:.3} Hz)", note.name(), note.freq());
 }
 
-/// Takes a PianoNote and the engine. Stops the note (triggers Release phase).
-///
-///   stop_sound(PianoNote::A4, &mut engine);
-pub fn stop_sound(note: PianoNote, engine: &mut InstrumentEngine)
+// Takes a PianoNote and the sequencer. Stops the note (triggers Release phase).
+pub fn stop_sound(note: PianoNote, seq: &mut StepSequencer)
 {
-    engine.pool.note_off(note.midi());
-    println!("[piano] OFF {}", note.name());
+    let idx = seq.tracks
+        .iter()
+        .position(|t| matches!(t.engine.current, InstrumentKind::Piano));
+
+    if let Some(idx) = idx
+    {
+        seq.tracks[idx].engine.pool.note_off(note.midi());
+        println!("[piano] OFF {}", note.name());
+    }
 }
