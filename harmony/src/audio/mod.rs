@@ -5,3 +5,5 @@ pub mod voice;
 pub mod filter;
 pub mod effects;
 pub mod instruments;
+pub mod piano;
+pub mod piano_test;

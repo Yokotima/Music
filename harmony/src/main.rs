@@ -1,21 +1,41 @@
-// src/main.rs
-mod audio;
 mod files;
-mod sequencer;
 mod ui;
 mod utils;
+mod audio;
+mod sequencer;
 
 use anyhow::Result;
 use std::io::{self, BufRead};
 
-fn main() -> Result<()> {
-    println!("=== HarmonyStudio ===");
+fn main() -> Result<()>
+{
+    let args: Vec<String> = std::env::args().collect();
+    let command = args.get(1).map(|s| s.as_str()).unwrap_or("default");
 
-    let _engine = audio::audio_engine::AudioEngine::start()?;
+    match command
+    {
+        "test_notes" =>
+        {
+            println!("=== HarmonyStudio — Test all piano notes ===");
+            audio::piano_test::run_all_notes()?;
+        }
 
-    println!("Press ENTER to stop.");
-    io::stdin().lock().lines().next();
+        "test_note" =>
+        {
+            let note_name = args.get(2).map(|s| s.as_str()).unwrap_or("A4");
+            println!("=== HarmonyStudio — Test note: {} ===", note_name);
+            audio::piano_test::run_single_note(note_name)?;
+        }
 
-    println!("Shutting down.");
+        _ =>
+        {
+            println!("=== HarmonyStudio ===");
+            println!("Commands:");
+            println!("  cargo run test_notes   → test all 88 piano keys");
+            println!("  cargo run test_note A4 → test one specific note");
+            println!();
+        }
+    }
+
     Ok(())
 }
