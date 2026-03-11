@@ -59,19 +59,19 @@ impl eframe::App for MyApp {
                 egui::ComboBox::from_id_salt("Instrument")
                     .selected_text(format!("{:?}",self.enum_instru))
                     .show_ui(ui, |ui| {
-                        if ui.button("piano").clicked(){
+                        if ui.button("Piano").clicked(){
                             self.enum_instru = Instrument::Piano;
                         };
-                        if ui.button("flute").clicked(){
+                        if ui.button("Flute").clicked(){
                             self.enum_instru = Instrument::Flute;
                         };
-                        if ui.button("basse").clicked(){
+                        if ui.button("Basse").clicked(){
                             self.enum_instru = Instrument::Bass;
                         };
-                        if ui.button("lead").clicked(){
+                        if ui.button("Lead").clicked(){
                             self.enum_instru = Instrument::Lead;
                         };
-                        if ui.button("pad").clicked(){
+                        if ui.button("Pad").clicked(){
                             self.enum_instru = Instrument::Pad;
                         };
                     }
