@@ -108,7 +108,7 @@ impl Instrument
             {
                 attack_secs:0.002, //0.002
                 decay_secs:1.9, // 1.8
-                sustain_level:0.05,
+                sustain_level:0.0,
                 release_secs:0.4,
             },
             filter:FilterPreset::piano(),   // LP 4kHz Q=0.707
