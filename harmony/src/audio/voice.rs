@@ -109,8 +109,10 @@ impl Voice
             self.active = false;
             self.note   = 255;
         }
+        let vel_amp = self.velocity * self.velocity;
+        let out = filtered_out * amp * vel_amp;
 
-        filtered_out * amp * self.velocity
+        out.tanh()
     }
 }
 

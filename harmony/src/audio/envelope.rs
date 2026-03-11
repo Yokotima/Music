@@ -63,10 +63,10 @@ impl EnvelopeParams
     {
         Self
         {
-            attack_secs:0.002,
-            decay_secs:1.5,
+            attack_secs:0.0008,
+            decay_secs:0.8,
             sustain_level:0.0,
-            release_secs:0.3,
+            release_secs:0.12,
         }
     }
 
@@ -189,7 +189,7 @@ impl Envelope
 
             EnvelopeState::Release =>
             {
-                self.level = self.level * self.release_coeff;
+                self.level = 0.0 + (self.level -0.0) * self.release_coeff;
                 if self.level < 0.0001
                 {
                     self.level = 0.0;
