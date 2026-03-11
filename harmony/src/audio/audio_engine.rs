@@ -1,22 +1,28 @@
-
+/// audio/audio_engine.rs
+///
+/// Sweden by C418 — Piano only, section 1:00 → 1:25
+/// All notes use PianoNote enum from piano.rs — no raw MIDI numbers.
 
 use anyhow::{anyhow, Result};
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{BufferSize, SampleRate, StreamConfig};
 
-
 use crate::sequencer::sequencer::StepSequencer;
 use super::instruments::InstrumentKind;
+use super::piano::PianoNote;
 
-pub const SAMPLE_RATE: u32    = 44_100;
+pub const SAMPLE_RATE: u32     = 44_100;
 pub const MAX_BUFFER_SIZE: u32 = 1024;
 
-pub struct AudioEngine {
+pub struct AudioEngine
+{
     _stream: cpal::Stream,
 }
 
-impl AudioEngine {
-    pub fn start() -> Result<Self> {
+impl AudioEngine
+{
+    pub fn start() -> Result<Self>
+    {
         let host   = cpal::default_host();
         let device = host
             .default_output_device()
@@ -24,7 +30,8 @@ impl AudioEngine {
 
         println!("[audio] Device : {}", device.name().unwrap_or("unknown".into()));
 
-        let config = StreamConfig {
+        let config = StreamConfig
+        {
             channels:    2,
             sample_rate: SampleRate(SAMPLE_RATE),
             buffer_size: BufferSize::Fixed(MAX_BUFFER_SIZE),
@@ -36,56 +43,114 @@ impl AudioEngine {
             MAX_BUFFER_SIZE as f32 / SAMPLE_RATE as f32 * 1000.0
         );
 
-        // ══════════════════════════════════════════════════════════════
-        // ② NOUVEAU : construction du séquenceur
-        //    - 120 BPM, grille 16 steps (= 4 mesures de 4 doubles-croches)
-        // ══════════════════════════════════════════════════════════════
-        let mut seq = StepSequencer::new(120.0, 16, SAMPLE_RATE);
+        // 95 BPM, 32 steps — 1 step = 1 eighth note, 1 bar = 6 steps (3/4)
+        let mut seq = StepSequencer::new(95.0, 32, SAMPLE_RATE);
 
-        // ── Piste 0 : Bass / kick ──────────────────────────────────
-        // add_track(instrument, note_midi_par_défaut)
-        // 36 = C2, convention kick en MIDI
-        seq.add_track(InstrumentKind::Bass, 36);
-        seq.set_step(0, 0,  true);   // temps 1
-        seq.set_step(0, 4,  true);   // temps 2
-        seq.set_step(0, 8,  true);   // temps 3
-        seq.set_step(0, 12, true);   // temps 4
+        // Shorthand: convert PianoNote to midi u8
+        let n = |note: PianoNote| note.midi();
 
-        // ── Piste 1 : Lead / mélodie ───────────────────────────────
-        // set_step_note(piste, step, note) — active le step et lui assigne une note
-        seq.add_track(InstrumentKind::Lead, 60); // C4 par défaut
-        seq.set_step_note(1,  0, 60u8);  // C4
-        seq.set_step_note(1,  2, 62u8);  // D4
-        seq.set_step_note(1,  4, 64u8);  // E4
-        seq.set_step_note(1,  6, 65u8);  // F4
-        seq.set_step_note(1,  8, 67u8);  // G4
-        seq.set_step_note(1, 12, 64u8);  // E4
+        // ── Track 0: Melody (right hand) ──────────────────────────────────
+        seq.add_track(InstrumentKind::Piano, n(PianoNote::Fs4));
 
-        // ── Piste 2 : Pad / harmonie ───────────────────────────────
-        seq.add_track(InstrumentKind::Pad, 60);
-        seq.set_step(2, 0, true);    // note par défaut (C4)
-        seq.set_step(2, 8, true);
+        // Bar 1 — F#m
+        seq.set_step_note(0,  0, n(PianoNote::Fs4));
+        seq.set_step_note(0,  2, n(PianoNote::E4));
+        seq.set_step_note(0,  4, n(PianoNote::D5));
+        seq.set_step_note(0,  5, n(PianoNote::Cs5));
 
-        // ③ Lancer la lecture
+        // Bar 2 — Bm
+        seq.set_step_note(0,  6, n(PianoNote::B4));
+        seq.set_step_note(0,  8, n(PianoNote::A4));
+        seq.set_step_note(0, 10, n(PianoNote::Gs4));
+
+        // Bar 3 — A
+        seq.set_step_note(0, 12, n(PianoNote::Fs4));
+        seq.set_step_note(0, 14, n(PianoNote::E4));
+        seq.set_step_note(0, 16, n(PianoNote::Cs5));
+        seq.set_step_note(0, 17, n(PianoNote::B4));
+
+        // Bar 4 — E
+        seq.set_step_note(0, 18, n(PianoNote::A4));
+        seq.set_step_note(0, 22, n(PianoNote::Fs4));
+
+        // Bar 5 — D
+        seq.set_step_note(0, 24, n(PianoNote::Gs4));
+        seq.set_step_note(0, 26, n(PianoNote::Fs4));
+        seq.set_step_note(0, 28, n(PianoNote::E4));
+        seq.set_step_note(0, 29, n(PianoNote::D4));
+
+        // Bar 6 — resolve
+        seq.set_step_note(0, 30, n(PianoNote::Cs4));
+        seq.set_step_note(0, 31, n(PianoNote::B3));
+
+        // ── Track 1: Arpeggios (left hand) ────────────────────────────────
+        // Pattern per bar: root - 3rd - 5th - 3rd - root - 3rd
+        seq.add_track(InstrumentKind::Piano, n(PianoNote::Fs2));
+
+        // Bar 1 — F#m  (Fs2 A2 Cs3)
+        seq.set_step_note(1,  0, n(PianoNote::Fs2));
+        seq.set_step_note(1,  1, n(PianoNote::A2));
+        seq.set_step_note(1,  2, n(PianoNote::Cs3));
+        seq.set_step_note(1,  3, n(PianoNote::A2));
+        seq.set_step_note(1,  4, n(PianoNote::Fs2));
+        seq.set_step_note(1,  5, n(PianoNote::A2));
+
+        // Bar 2 — Bm  (B1 D2 Fs2)
+        seq.set_step_note(1,  6, n(PianoNote::B1));
+        seq.set_step_note(1,  7, n(PianoNote::D2));
+        seq.set_step_note(1,  8, n(PianoNote::Fs2));
+        seq.set_step_note(1,  9, n(PianoNote::D2));
+        seq.set_step_note(1, 10, n(PianoNote::B1));
+        seq.set_step_note(1, 11, n(PianoNote::D2));
+
+        // Bar 3 — A  (A1 Cs2 E2)
+        seq.set_step_note(1, 12, n(PianoNote::A1));
+        seq.set_step_note(1, 13, n(PianoNote::Cs2));
+        seq.set_step_note(1, 14, n(PianoNote::E2));
+        seq.set_step_note(1, 15, n(PianoNote::Cs2));
+        seq.set_step_note(1, 16, n(PianoNote::A1));
+        seq.set_step_note(1, 17, n(PianoNote::Cs2));
+
+        // Bar 4 — E  (E2 Gs2 B2)
+        seq.set_step_note(1, 18, n(PianoNote::E2));
+        seq.set_step_note(1, 19, n(PianoNote::Gs2));
+        seq.set_step_note(1, 20, n(PianoNote::B2));
+        seq.set_step_note(1, 21, n(PianoNote::Gs2));
+        seq.set_step_note(1, 22, n(PianoNote::E2));
+        seq.set_step_note(1, 23, n(PianoNote::Gs2));
+
+        // Bar 5 — D  (D2 Fs2 A2)
+        seq.set_step_note(1, 24, n(PianoNote::D2));
+        seq.set_step_note(1, 25, n(PianoNote::Fs2));
+        seq.set_step_note(1, 26, n(PianoNote::A2));
+        seq.set_step_note(1, 27, n(PianoNote::Fs2));
+        seq.set_step_note(1, 28, n(PianoNote::D2));
+        seq.set_step_note(1, 29, n(PianoNote::Fs2));
+
+        // Bar 6 — F#m resolve
+        seq.set_step_note(1, 30, n(PianoNote::Fs2));
+        seq.set_step_note(1, 31, n(PianoNote::A2));
+
+        // ── Velocities ────────────────────────────────────────────────────
+        seq.tracks[0].default_velocity = 0.82; // melody
+        seq.tracks[1].default_velocity = 0.42; // arpeggios
+
         seq.play();
 
-        println!("[audio] Séquenceur prêt — {} pistes, {} steps à {} BPM",
-            seq.tracks.len(), seq.step_count, seq.bpm());
+        println!("[audio] Sweden (1:00-1:25) — Piano | F# minor | 95 BPM");
+        println!("[audio] 2 tracks | 32 steps | loops");
 
-        // ④ Le séquenceur est déplacé dans le callback (move)
         let channels = config.channels as usize;
 
         let stream = device.build_output_stream(
             &config,
-            move |output: &mut [f32], _: &cpal::OutputCallbackInfo| {
-                for frame in output.chunks_mut(channels) {
-
-                    // ⑤ UNE seule ligne remplace toute la logique timeline/cursor/piano
-                    //    next_sample() avance l'horloge, déclenche les notes
-                    //    et retourne la somme de toutes les pistes.
+            move |output: &mut [f32], _: &cpal::OutputCallbackInfo|
+            {
+                for frame in output.chunks_mut(channels)
+                {
                     let out = seq.next_sample();
-
-                    for ch in frame.iter_mut() {
+                    for ch in frame.iter_mut()
+                    {
                         *ch = out;
                     }
                 }
