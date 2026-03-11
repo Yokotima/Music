@@ -1,7 +1,6 @@
 use eframe::egui;
 use crate::audio::piano_test;
 
-
 pub fn window() -> eframe::Result {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default().with_inner_size([800.0, 480.0]),
@@ -14,17 +13,27 @@ pub fn window() -> eframe::Result {
     )
 }
 
+#[derive(Debug)]
+pub enum Instrument
+{
+    Piano,
+    Flute,
+    Bass,
+    Pad,
+    Lead,
+}
+
 struct MyApp{
     name: String,
-    instru: String,
-
+    enum_instru: Instrument,
 }
+
 
 impl Default for MyApp {
     fn default() -> Self {
         Self {
             name: "world".to_string(),
-            instru: "None".to_string(),
+            enum_instru: Instrument::Piano,
         }
     }
 }
@@ -32,30 +41,68 @@ impl Default for MyApp {
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame:&mut eframe::Frame){
         egui::CentralPanel::default().show(ctx, |ui|{
-            ui.heading("Test");
-            ui.separator();
-            
-            egui::ComboBox::from_label("Select")
-                .selected_text(format!("{}",self.instru))
-                .show_ui(ui, |ui| {
-                    if ui.button("piano").clicked(){
-                        self.instru = "piano".to_string()
-                    };
-                    if ui.button("flute").clicked(){
-                        self.instru = "flute".to_string()
-                    };
-                    if ui.button("basse").clicked(){
-                        self.instru = "basse".to_string()
-                    };
-                    if ui.button("lead").clicked(){
-                        self.instru = "lead".to_string()
-                    };
-                    if ui.button("pad").clicked(){
-                        self.instru = "pad".to_string()
-                    };
-                }
-            );
+            ui.horizontal(|ui| {
+                egui::ComboBox::from_id_salt("Files")
+                    .selected_text(format!("Files"))
+                    .show_ui(ui, |ui| {
+                        if ui.button("Save").clicked(){
 
+                        }
+                        if ui.button("Import").clicked(){
+
+                        }
+                        if ui.button("Export").clicked(){
+
+                        }
+                    }
+                );
+                egui::ComboBox::from_id_salt("Instrument")
+                    .selected_text(format!("{:?}",self.enum_instru))
+                    .show_ui(ui, |ui| {
+                        if ui.button("Piano").clicked(){
+                            self.enum_instru = Instrument::Piano;
+                        };
+                        if ui.button("Flute").clicked(){
+                            self.enum_instru = Instrument::Flute;
+                        };
+                        if ui.button("Basse").clicked(){
+                            self.enum_instru = Instrument::Bass;
+                        };
+                        if ui.button("Lead").clicked(){
+                            self.enum_instru = Instrument::Lead;
+                        };
+                        if ui.button("Pad").clicked(){
+                            self.enum_instru = Instrument::Pad;
+                        };
+                    }
+                );
+                egui::ComboBox::from_id_salt("Effect")
+                    .selected_text(format!("Effect"))
+                    .show_ui(ui, |ui| {
+                        if ui.button("Reverb").clicked(){
+
+                        }
+                        if ui.button("?").clicked(){
+
+                        }
+                        if ui.button("?").clicked(){
+
+                        }
+                        if ui.button("?").clicked(){
+
+                        }
+                    }
+                );
+                egui::ComboBox::from_id_salt("")
+                    .selected_text(format!("??"))
+                    .show_ui(ui, |ui| {
+                        if ui.button("?").clicked(){
+
+                        }
+                    }
+                );
+                
+            });
             ui.separator();
             ui.horizontal(|ui| {
                 ui.label("sound test :");
@@ -63,6 +110,8 @@ impl eframe::App for MyApp {
                     piano_test::run_all_notes();
                 }
             });
+            ui.separator();
+
         });
     }
 }
