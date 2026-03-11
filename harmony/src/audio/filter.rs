@@ -312,8 +312,8 @@ impl FilterPreset
         Self
         { 
             filter_type:FilterType::LowPass,
-            cutoff_hz:4_000.0,
-            q:0.707
+            cutoff_hz:4_000.0, //Init was 4_000.0
+            q:0.707 //Init was 0.707
         }
     }
 
@@ -346,7 +346,7 @@ impl FilterPreset
         { 
             filter_type:FilterType::LowPass,
             cutoff_hz:1_200.0, 
-            q:1.5
+            q:1.2 //Init was 1.5
         }
     }
 

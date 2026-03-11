@@ -107,12 +107,20 @@ impl Instrument
             envelope:EnvelopeParams
             {
                 attack_secs:0.002, //0.002
-                decay_secs:1.9, // 1.8
-                sustain_level:0.05,
-                release_secs:0.4,
+                decay_secs:1.8, // 1.8
+                sustain_level:0.0,
+                release_secs:0.3,
             },
             filter:FilterPreset::piano(),   // LP 4kHz Q=0.707
-            effects:EffectConfig::none(),
+            //effects:EffectConfig::none(),
+            effects:EffectConfig
+            {
+            delay_ms:0.0,
+            feedback:0.0,
+            delay_wet:0.0,
+            room_size:0.45,
+            reverb_wet:0.08,
+            },
         }
     }
     //==========Flute==========
