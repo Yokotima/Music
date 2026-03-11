@@ -15,3 +15,5 @@ anyhow = "1.0"
 
 # ui
 eframe = "0.31"
+egui = "0.27"
+egui_virtual_keyboard = "=0.1.3"
