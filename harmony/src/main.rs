@@ -26,13 +26,9 @@ fn main() -> Result<()>
             println!("=== HarmonyStudio — Test note: {} ===", note_name);
             audio::piano_test::run_single_note(note_name)?;
         }
-        "test_music" =>
+        "test_window" =>
         {
-            println!("=== HarmonyStudio — Test Music===");
-            let _engine = audio::audio_engine::AudioEngine::start()?;
-            println!("Press ENTER to stop.");
-            io::stdin().lock().lines().next();
-            println!("Shutting down.");
+            io::window::window();
         }
 
         _ =>
@@ -41,7 +37,7 @@ fn main() -> Result<()>
             println!("Commands:");
             println!("  cargo run test_notes   -> test all 88 piano keys");
             println!("  cargo run test_note A4 -> test one specific note");
-            println!("  cargo run test_music   -> test a music");
+            println!("  cargo run test_window  -> test the window");
             println!();
         }
     }
