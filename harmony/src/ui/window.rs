@@ -1,5 +1,12 @@
 use eframe::egui;
+use eframe::epaint::Color32;
 use crate::audio::piano_test;
+use crate::audio::piano;
+use crate::audio::piano::PianoNote;
+use crate::audio::piano::play_sound;
+use crate::audio::piano::stop_sound;
+use std::time::Duration;
+use crate::sequencer::sequencer::StepSequencer;
 
 pub fn window() -> eframe::Result {
     let options = eframe::NativeOptions {
@@ -14,6 +21,7 @@ pub fn window() -> eframe::Result {
 }
 
 #[derive(Debug)]
+#[derive(PartialEq)]
 pub enum Instrument
 {
     Piano,
@@ -26,6 +34,7 @@ pub enum Instrument
 struct MyApp{
     name: String,
     enum_instru: Instrument,
+    s: StepSequencer,
 }
 
 
@@ -34,6 +43,7 @@ impl Default for MyApp {
         Self {
             name: "world".to_string(),
             enum_instru: Instrument::Piano,
+            s: StepSequencer::new(120.0, 16, 44_100),
         }
     }
 }
@@ -111,7 +121,101 @@ impl eframe::App for MyApp {
                 }
             });
             ui.separator();
-
+            egui::Frame::none()
+                .fill(egui::Color32::GRAY)
+                .show(ui, |ui| {
+                ui.scope(|ui| {
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::WHITE;
+                    if ui.button("         ").clicked()
+                    {
+                        piano::play_sound(PianoNote::B4,0.75,&mut self.s );
+                        std::thread::sleep(std::time::Duration::from_millis(300));
+                        piano::stop_sound(PianoNote::B4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::BLACK;
+                    if ui.button("       ").clicked()
+                    {
+                        piano::play_sound(PianoNote::As4,0.75,&mut self.s );
+                        std::thread::sleep(std::time::Duration::from_millis(300));
+                        piano::stop_sound(PianoNote::As4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::WHITE;
+                    if ui.button("         ").clicked()
+                    {
+                        piano::play_sound(PianoNote::A4,0.75,&mut self.s );
+                        std::thread::sleep(std::time::Duration::from_millis(300));
+                        piano::stop_sound(PianoNote::A4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::BLACK;
+                    if ui.button("       ").clicked()
+                    {
+                        piano::play_sound(PianoNote::Gs4,0.75,&mut self.s );
+                        std::thread::sleep(std::time::Duration::from_millis(300));
+                        piano::stop_sound(PianoNote::Gs4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::WHITE;
+                    if ui.button("         ").clicked()
+                    {
+                        piano::play_sound(PianoNote::G4,0.75,&mut self.s );
+                        std::thread::sleep(std::time::Duration::from_millis(300));
+                        piano::stop_sound(PianoNote::G4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::BLACK;  
+                    if ui.button("       ").clicked()
+                    {
+                        piano::play_sound(PianoNote::Fs4,0.75,&mut self.s );
+                        std::thread::sleep(std::time::Duration::from_millis(300));
+                        piano::stop_sound(PianoNote::Fs4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::WHITE;
+                    if ui.button("         ").clicked()
+                    {
+                        piano::play_sound(PianoNote::F4,0.75,&mut self.s );
+                        piano::stop_sound(PianoNote::F4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::WHITE;
+                    if ui.button("         ").clicked()
+                    {
+                        piano::play_sound(PianoNote::E4,0.75,&mut self.s );
+                        piano::stop_sound(PianoNote::E4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::BLACK;
+                    if ui.button("       ").clicked()
+                    {
+                        piano::play_sound(PianoNote::Ds4,0.75,&mut self.s );
+                        piano::stop_sound(PianoNote::Ds4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::WHITE;
+                    if ui.button("         ").clicked()
+                    {
+                        piano::play_sound(PianoNote::D4,0.75,&mut self.s );
+                        piano::stop_sound(PianoNote::D4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::BLACK;
+                    if ui.button("       ").clicked()
+                    {
+                        play_note(PianoNote::Cs4 , 1.0);
+                        piano::play_sound(PianoNote::Cs4,0.75,&mut self.s );
+                        piano::stop_sound(PianoNote::Cs4, &mut self.s);
+                    }
+                    ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::WHITE;
+                    if ui.button("         ").clicked()
+                    {
+                        play_note(PianoNote::C4 , 1.0);
+                    }
+                });
+            });
         });
     }
 }
+
+
+pub fn play_note(note: PianoNote, duration_secs: f32)
+{
+    let mut seq = StepSequencer::new(120.0,16,44_100);
+
+    play_sound(note, 1.0, &mut seq);
+    std::thread::sleep(Duration::from_secs_f32(duration_secs));
+    stop_sound(note, &mut seq);
+}
+
