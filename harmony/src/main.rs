@@ -16,7 +16,9 @@ fn main() -> Result<()> {
     match args.get(1).map(|s| s.as_str()) {
 
         Some("window") => {
-            ui::window::window()?;
+            if let Err(e) = ui::window::window() {
+                eprintln!("Window error: {e}");
+            }
         }
 
         Some("json") => {
@@ -33,7 +35,7 @@ fn main() -> Result<()> {
             }
 
             match load_from_json("../test.json") {
-                Ok(project) => println!("Project loaded from test.json: {:?}", project),
+                Ok(project) => println!("Project loaded: {:?}", project),
                 Err(e) => eprintln!("Error loading project: {}", e),
             }
         }
