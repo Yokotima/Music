@@ -18,23 +18,7 @@ use super::oscillator::{
 pub const MAX_VOICES: usize = 32;
 const MASTER_GAIN: f32 = 1.0 / (MAX_VOICES as f32 / 4.0);
 
-//==========NoteEvent==========
-#[derive(Debug, Clone, Copy)]
-pub enum NoteEvent
-{
-    NoteOn
-    {
-        note:u8,
-        velocity:f32
-    },
-    NoteOff
-    { 
-        note:u8
-    },
-}
-
 // Takes a MIDI note number [0-127]. Returns the frequency in Hz.
-// Example: 69 -> 440.0 Hz (A4), 60 -> 261.6 Hz (C4).
 pub fn midi_to_freq(note: u8) -> f32
 {
     440.0 * 2.0_f32.powf((note as f32 - 69.0) / 12.0)

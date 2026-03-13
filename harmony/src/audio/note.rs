@@ -1,129 +1,120 @@
 /// All 88 keys of a standard piano as an enum.
 /// Each variant knows its own MIDI number and frequency.
-///
-/// Usage:
-///   play_sound(PianoNote::A4, 0.8, &mut engine);
-///   stop_sound(PianoNote::A4, &mut engine);
 
-use crate::sequencer::sequencer::StepSequencer;
-use super::instruments::InstrumentKind;
-
-// PianoNote — all 88 keys of a standard piano
 // Naming: Note + Octave. Sharps written as "s" (Cs4 = C#4, Fs3 = F#3).
-// Standard piano: A0 (key 1, MIDI 21) → C8 (key 88, MIDI 108)
 // Reference: A4 = 440.0 Hz (key 49, MIDI 69)
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub enum PianoNote
+pub enum MidiNote
 {
     //====Octave 0 (keys 1-3)
-    A0,   // key  1 | MIDI 21 |  27.500 Hz
-    As0,  // key  2 | MIDI 22 |  29.135 Hz
-    B0,   // key  3 | MIDI 23 |  30.868 Hz
+    A0,   // MIDI 21 |  27.500 Hz
+    As0,  // MIDI 22 |  29.135 Hz
+    B0,   // MIDI 23 |  30.868 Hz
 
     //====Octave 1 (keys 4-15)
-    C1,   // key  4 | MIDI 24 |  32.703 Hz
-    Cs1,  // key  5 | MIDI 25 |  34.648 Hz
-    D1,   // key  6 | MIDI 26 |  36.708 Hz
-    Ds1,  // key  7 | MIDI 27 |  38.891 Hz
-    E1,   // key  8 | MIDI 28 |  41.203 Hz
-    F1,   // key  9 | MIDI 29 |  43.654 Hz
-    Fs1,  // key 10 | MIDI 30 |  46.249 Hz
-    G1,   // key 11 | MIDI 31 |  48.999 Hz
-    Gs1,  // key 12 | MIDI 32 |  51.913 Hz
-    A1,   // key 13 | MIDI 33 |  55.000 Hz
-    As1,  // key 14 | MIDI 34 |  58.270 Hz
-    B1,   // key 15 | MIDI 35 |  61.735 Hz
+    C1,   // MIDI 24 |  32.703 Hz
+    Cs1,  // MIDI 25 |  34.648 Hz
+    D1,   // MIDI 26 |  36.708 Hz
+    Ds1,  // MIDI 27 |  38.891 Hz
+    E1,   // MIDI 28 |  41.203 Hz
+    F1,   // MIDI 29 |  43.654 Hz
+    Fs1,  // MIDI 30 |  46.249 Hz
+    G1,   // MIDI 31 |  48.999 Hz
+    Gs1,  // MIDI 32 |  51.913 Hz
+    A1,   // MIDI 33 |  55.000 Hz
+    As1,  // MIDI 34 |  58.270 Hz
+    B1,   // MIDI 35 |  61.735 Hz
 
     //====Octave 2 (keys 16-27)
-    C2,   // key 16 | MIDI 36 |  65.406 Hz
-    Cs2,  // key 17 | MIDI 37 |  69.296 Hz
-    D2,   // key 18 | MIDI 38 |  73.416 Hz
-    Ds2,  // key 19 | MIDI 39 |  77.782 Hz
-    E2,   // key 20 | MIDI 40 |  82.407 Hz
-    F2,   // key 21 | MIDI 41 |  87.307 Hz
-    Fs2,  // key 22 | MIDI 42 |  92.499 Hz
-    G2,   // key 23 | MIDI 43 |  97.999 Hz
-    Gs2,  // key 24 | MIDI 44 | 103.826 Hz
-    A2,   // key 25 | MIDI 45 | 110.000 Hz
-    As2,  // key 26 | MIDI 46 | 116.541 Hz
-    B2,   // key 27 | MIDI 47 | 123.471 Hz
+    C2,   // MIDI 36 |  65.406 Hz
+    Cs2,  // MIDI 37 |  69.296 Hz
+    D2,   // MIDI 38 |  73.416 Hz
+    Ds2,  // MIDI 39 |  77.782 Hz
+    E2,   // MIDI 40 |  82.407 Hz
+    F2,   // MIDI 41 |  87.307 Hz
+    Fs2,  // MIDI 42 |  92.499 Hz
+    G2,   // MIDI 43 |  97.999 Hz
+    Gs2,  // MIDI 44 | 103.826 Hz
+    A2,   // MIDI 45 | 110.000 Hz
+    As2,  // MIDI 46 | 116.541 Hz
+    B2,   // MIDI 47 | 123.471 Hz
 
     //====Octave 3 (keys 28-39)
-    C3,   // key 28 | MIDI 48 | 130.813 Hz
-    Cs3,  // key 29 | MIDI 49 | 138.591 Hz
-    D3,   // key 30 | MIDI 50 | 146.832 Hz
-    Ds3,  // key 31 | MIDI 51 | 155.563 Hz
-    E3,   // key 32 | MIDI 52 | 164.814 Hz
-    F3,   // key 33 | MIDI 53 | 174.614 Hz
-    Fs3,  // key 34 | MIDI 54 | 184.997 Hz
-    G3,   // key 35 | MIDI 55 | 195.998 Hz
-    Gs3,  // key 36 | MIDI 56 | 207.652 Hz
-    A3,   // key 37 | MIDI 57 | 220.000 Hz
-    As3,  // key 38 | MIDI 58 | 233.082 Hz
-    B3,   // key 39 | MIDI 59 | 246.942 Hz
+    C3,   // MIDI 48 | 130.813 Hz
+    Cs3,  // MIDI 49 | 138.591 Hz
+    D3,   // MIDI 50 | 146.832 Hz
+    Ds3,  // MIDI 51 | 155.563 Hz
+    E3,   // MIDI 52 | 164.814 Hz
+    F3,   // MIDI 53 | 174.614 Hz
+    Fs3,  // MIDI 54 | 184.997 Hz
+    G3,   // MIDI 55 | 195.998 Hz
+    Gs3,  // MIDI 56 | 207.652 Hz
+    A3,   // MIDI 57 | 220.000 Hz
+    As3,  // MIDI 58 | 233.082 Hz
+    B3,   // MIDI 59 | 246.942 Hz
 
     //====Octave 4 (keys 40-51)
-    C4,   // key 40 | MIDI 60 | 261.626 Hz
-    Cs4,  // key 41 | MIDI 61 | 277.183 Hz
-    D4,   // key 42 | MIDI 62 | 293.665 Hz
-    Ds4,  // key 43 | MIDI 63 | 311.127 Hz
-    E4,   // key 44 | MIDI 64 | 329.628 Hz
-    F4,   // key 45 | MIDI 65 | 349.228 Hz
-    Fs4,  // key 46 | MIDI 66 | 369.994 Hz
-    G4,   // key 47 | MIDI 67 | 391.995 Hz
-    Gs4,  // key 48 | MIDI 68 | 415.305 Hz
-    A4,   // key 49 | MIDI 69 | 440.000 Hz
-    As4,  // key 50 | MIDI 70 | 466.164 Hz
-    B4,   // key 51 | MIDI 71 | 493.883 Hz
+    C4,   // MIDI 60 | 261.626 Hz
+    Cs4,  // MIDI 61 | 277.183 Hz
+    D4,   // MIDI 62 | 293.665 Hz
+    Ds4,  // MIDI 63 | 311.127 Hz
+    E4,   // MIDI 64 | 329.628 Hz
+    F4,   // MIDI 65 | 349.228 Hz
+    Fs4,  // MIDI 66 | 369.994 Hz
+    G4,   // MIDI 67 | 391.995 Hz
+    Gs4,  // MIDI 68 | 415.305 Hz
+    A4,   // MIDI 69 | 440.000 Hz
+    As4,  // MIDI 70 | 466.164 Hz
+    B4,   // MIDI 71 | 493.883 Hz
 
     //====Octave 5 (keys 52-63)
-    C5,   // key 52 | MIDI 72 | 523.251 Hz
-    Cs5,  // key 53 | MIDI 73 | 554.365 Hz
-    D5,   // key 54 | MIDI 74 | 587.330 Hz
-    Ds5,  // key 55 | MIDI 75 | 622.254 Hz
-    E5,   // key 56 | MIDI 76 | 659.255 Hz
-    F5,   // key 57 | MIDI 77 | 698.456 Hz
-    Fs5,  // key 58 | MIDI 78 | 739.989 Hz
-    G5,   // key 59 | MIDI 79 | 783.991 Hz
-    Gs5,  // key 60 | MIDI 80 | 830.609 Hz
-    A5,   // key 61 | MIDI 81 | 880.000 Hz
-    As5,  // key 62 | MIDI 82 | 932.328 Hz
-    B5,   // key 63 | MIDI 83 | 987.767 Hz
+    C5,   // MIDI 72 | 523.251 Hz
+    Cs5,  // MIDI 73 | 554.365 Hz
+    D5,   // MIDI 74 | 587.330 Hz
+    Ds5,  // MIDI 75 | 622.254 Hz
+    E5,   // MIDI 76 | 659.255 Hz
+    F5,   // MIDI 77 | 698.456 Hz
+    Fs5,  // MIDI 78 | 739.989 Hz
+    G5,   // MIDI 79 | 783.991 Hz
+    Gs5,  // MIDI 80 | 830.609 Hz
+    A5,   // MIDI 81 | 880.000 Hz
+    As5,  // MIDI 82 | 932.328 Hz
+    B5,   // MIDI 83 | 987.767 Hz
 
     //====Octave 6 (keys 64-75)
-    C6,   // key 64 | MIDI 84 | 1046.502 Hz
-    Cs6,  // key 65 | MIDI 85 | 1108.731 Hz
-    D6,   // key 66 | MIDI 86 | 1174.659 Hz
-    Ds6,  // key 67 | MIDI 87 | 1244.508 Hz
-    E6,   // key 68 | MIDI 88 | 1318.510 Hz
-    F6,   // key 69 | MIDI 89 | 1396.913 Hz
-    Fs6,  // key 70 | MIDI 90 | 1479.978 Hz
-    G6,   // key 71 | MIDI 91 | 1567.982 Hz
-    Gs6,  // key 72 | MIDI 92 | 1661.219 Hz
-    A6,   // key 73 | MIDI 93 | 1760.000 Hz
-    As6,  // key 74 | MIDI 94 | 1864.655 Hz
-    B6,   // key 75 | MIDI 95 | 1975.533 Hz
+    C6,   // MIDI 84 | 1046.502 Hz
+    Cs6,  // MIDI 85 | 1108.731 Hz
+    D6,   // MIDI 86 | 1174.659 Hz
+    Ds6,  // MIDI 87 | 1244.508 Hz
+    E6,   // MIDI 88 | 1318.510 Hz
+    F6,   // MIDI 89 | 1396.913 Hz
+    Fs6,  // MIDI 90 | 1479.978 Hz
+    G6,   // MIDI 91 | 1567.982 Hz
+    Gs6,  // MIDI 92 | 1661.219 Hz
+    A6,   // MIDI 93 | 1760.000 Hz
+    As6,  // MIDI 94 | 1864.655 Hz
+    B6,   // MIDI 95 | 1975.533 Hz
 
     //====Octave 7 (keys 76-87)
-    C7,   // key 76 | MIDI  96 | 2093.005 Hz
-    Cs7,  // key 77 | MIDI  97 | 2217.461 Hz
-    D7,   // key 78 | MIDI  98 | 2349.318 Hz
-    Ds7,  // key 79 | MIDI  99 | 2489.016 Hz
-    E7,   // key 80 | MIDI 100 | 2637.020 Hz
-    F7,   // key 81 | MIDI 101 | 2793.826 Hz
-    Fs7,  // key 82 | MIDI 102 | 2959.955 Hz
-    G7,   // key 83 | MIDI 103 | 3135.963 Hz
-    Gs7,  // key 84 | MIDI 104 | 3322.438 Hz
-    A7,   // key 85 | MIDI 105 | 3520.000 Hz
-    As7,  // key 86 | MIDI 106 | 3729.310 Hz
-    B7,   // key 87 | MIDI 107 | 3951.066 Hz
+    C7,   // MIDI  96 | 2093.005 Hz
+    Cs7,  // MIDI  97 | 2217.461 Hz
+    D7,   // MIDI  98 | 2349.318 Hz
+    Ds7,  // MIDI  99 | 2489.016 Hz
+    E7,   // MIDI 100 | 2637.020 Hz
+    F7,   // MIDI 101 | 2793.826 Hz
+    Fs7,  // MIDI 102 | 2959.955 Hz
+    G7,   // MIDI 103 | 3135.963 Hz
+    Gs7,  // MIDI 104 | 3322.438 Hz
+    A7,   // MIDI 105 | 3520.000 Hz
+    As7,  // MIDI 106 | 3729.310 Hz
+    B7,   // MIDI 107 | 3951.066 Hz
 
     //====Octave 8 (key 88)
-    C8,   // key 88 | MIDI 108 | 4186.009 Hz
+    C8,   // MIDI 108 | 4186.009 Hz
 }
 
-impl PianoNote
+impl MidiNote
 {
     // Takes nothing. Returns the MIDI note number for this key [21-108].
     pub fn midi(&self) -> u8
@@ -221,13 +212,6 @@ impl PianoNote
         }
     }
 
-    // Takes nothing. Returns the exact frequency in Hz for this key.
-    // Formula: 440.0 * 2^((midi - 69) / 12)  (equal temperament, A4 = 440 Hz)
-    pub fn freq(&self) -> f32
-    {
-        440.0 * 2.0_f32.powf((self.midi() as f32 - 69.0) / 12.0)
-    }
-
     // Takes nothing. Returns the display name of this key as a string.
     pub fn name(&self) -> &'static str
     {
@@ -323,39 +307,104 @@ impl PianoNote
             Self::C8 => "C8",
         }
     }
-}
 
-//==========play_sound / stop_sound==========
-
-// Takes a PianoNote, a velocity and the sequencer.
-// Finds the first Piano track and triggers the note on it.
-// If no Piano track exists yet, creates one automatically.
-pub fn play_sound(note: PianoNote, velocity: f32, seq: &mut StepSequencer)
-{
-    let idx = seq.tracks
-        .iter()
-        .position(|t| matches!(t.engine.current, InstrumentKind::Piano));
-
-    let idx = match idx
+    // Takes nothing. Returns the exact frequency in Hz for this key.
+    // Formula: 440.0 * 2^((midi - 69) / 12)  (equal temperament, A4 = 440 Hz)
+    pub fn freq(&self) -> f32
     {
-        Some(i) => i,
-        None    => seq.add_track(InstrumentKind::Piano, note.midi()),
-    };
-
-    seq.tracks[idx].engine.pool.note_on(note.midi(), velocity);
-    println!("[piano] ON  {} ({:.3} Hz)", note.name(), note.freq());
-}
-
-// Takes a PianoNote and the sequencer. Stops the note (triggers Release phase).
-pub fn stop_sound(note: PianoNote, seq: &mut StepSequencer)
-{
-    let idx = seq.tracks
-        .iter()
-        .position(|t| matches!(t.engine.current, InstrumentKind::Piano));
-
-    if let Some(idx) = idx
-    {
-        seq.tracks[idx].engine.pool.note_off(note.midi());
-        println!("[piano] OFF {}", note.name());
+        440.0 * 2.0_f32.powf((self.midi() as f32 - 69.0) / 12.0)
     }
 }
+
+//==========Instrument Notes==========
+// All 88 notes in order — useful for iteration (e.g. play_melody over all keys).
+pub const ALL_NOTES: [MidiNote; 88] = [
+    MidiNote::A0,
+    MidiNote::As0,
+    MidiNote::B0,
+    MidiNote::C1,
+    MidiNote::Cs1,
+    MidiNote::D1,
+    MidiNote::Ds1,
+    MidiNote::E1,
+    MidiNote::F1,
+    MidiNote::Fs1,
+    MidiNote::G1,
+    MidiNote::Gs1,
+    MidiNote::A1,
+    MidiNote::As1,
+    MidiNote::B1,
+    MidiNote::C2,
+    MidiNote::Cs2,
+    MidiNote::D2,
+    MidiNote::Ds2,
+    MidiNote::E2,
+    MidiNote::F2,
+    MidiNote::Fs2,
+    MidiNote::G2,
+    MidiNote::Gs2,
+    MidiNote::A2,
+    MidiNote::As2,
+    MidiNote::B2,
+    MidiNote::C3,
+    MidiNote::Cs3,
+    MidiNote::D3,
+    MidiNote::Ds3,
+    MidiNote::E3,
+    MidiNote::F3,
+    MidiNote::Fs3,
+    MidiNote::G3,
+    MidiNote::Gs3,
+    MidiNote::A3,
+    MidiNote::As3,
+    MidiNote::B3,
+    MidiNote::C4,
+    MidiNote::Cs4,
+    MidiNote::D4,
+    MidiNote::Ds4,
+    MidiNote::E4,
+    MidiNote::F4,
+    MidiNote::Fs4, 
+    MidiNote::G4,
+    MidiNote::Gs4,
+    MidiNote::A4,  
+    MidiNote::As4, 
+    MidiNote::B4,
+    MidiNote::C5,  
+    MidiNote::Cs5, 
+    MidiNote::D5,  
+    MidiNote::Ds5,
+    MidiNote::E5,  
+    MidiNote::F5,  
+    MidiNote::Fs5, 
+    MidiNote::G5,
+    MidiNote::Gs5, 
+    MidiNote::A5,  
+    MidiNote::As5, 
+    MidiNote::B5,
+    MidiNote::C6,  
+    MidiNote::Cs6, 
+    MidiNote::D6,  
+    MidiNote::Ds6,
+    MidiNote::E6,  
+    MidiNote::F6,  
+    MidiNote::Fs6, 
+    MidiNote::G6,
+    MidiNote::Gs6, 
+    MidiNote::A6,  
+    MidiNote::As6, 
+    MidiNote::B6,
+    MidiNote::C7,  
+    MidiNote::Cs7, 
+    MidiNote::D7,  
+    MidiNote::Ds7,
+    MidiNote::E7,  
+    MidiNote::F7,  
+    MidiNote::Fs7, 
+    MidiNote::G7,
+    MidiNote::Gs7, 
+    MidiNote::A7,  
+    MidiNote::As7, 
+    MidiNote::B7,
+    MidiNote::C8,
+];

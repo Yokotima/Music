@@ -45,44 +45,6 @@ pub struct EnvelopeParams
     pub release_secs:f32,
 }
 
-impl EnvelopeParams
-{
-    pub fn default_synth() -> Self
-    {
-        Self
-        {
-            attack_secs:0.01,
-            decay_secs:0.1,
-            sustain_level:0.8,
-            release_secs:0.2,
-        }
-    }
-
-    //Piano: near-instant attack, long natural decay, no sustain
-    pub fn piano() -> Self
-    {
-        Self
-        {
-            attack_secs:0.0008,
-            decay_secs:0.8,
-            sustain_level:0.0,
-            release_secs:0.12,
-        }
-    }
-
-    //Pad: slow fade in, held sustain, long release
-    pub fn pad() -> Self
-    {
-        Self
-        {
-            attack_secs:0.4,
-            decay_secs:0.2,
-            sustain_level:0.9,
-            release_secs:1.5,
-        }
-    }
-}
-
 //==========Envelope==========
 pub struct Envelope
 {
