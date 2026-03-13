@@ -1,6 +1,19 @@
 [package]
 name = "harmony"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
 
 [dependencies]
+# Cross-platform audio I/O
+cpal = "0.15"
+
+# Lock-free ring buffer for future communication with the sequencer
+ringbuf = "0.3"
+
+# Helpful for clean error handling
+anyhow = "1.0"
+
+# ui
+eframe = "0.31"
+egui = "0.27"
+egui_virtual_keyboard = "=0.1.3"
