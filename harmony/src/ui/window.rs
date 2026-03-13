@@ -1,5 +1,12 @@
 use eframe::egui;
+use eframe::epaint::Color32;
 use crate::audio::piano_test;
+use crate::audio::piano;
+use crate::audio::piano::PianoNote;
+use crate::audio::piano::play_sound;
+use crate::audio::piano::stop_sound;
+use std::time::Duration;
+use crate::sequencer::sequencer::StepSequencer;
 
 pub fn window() -> eframe::Result {
     let options = eframe::NativeOptions {
@@ -13,9 +20,13 @@ pub fn window() -> eframe::Result {
     )
 }
 
+#[derive(Clone)]
+#[derive(Copy)]
 #[derive(Debug)]
+#[derive(PartialEq)]
 pub enum Instrument
 {
+    None,
     Piano,
     Flute,
     Bass,
@@ -23,9 +34,20 @@ pub enum Instrument
     Lead,
 }
 
+struct Key{
+    note: PianoNote,
+    color: Color32,
+}
+
 struct MyApp{
     name: String,
     enum_instru: Instrument,
+    s: StepSequencer,
+    part_piano: [[bool; 255]; 88],
+    part_flute: [[bool; 255]; 88],
+    part_bass: [[bool; 255]; 88],
+    part_pad: [[bool; 255]; 88],
+    part_lead: [[bool; 255]; 88],
 }
 
 
@@ -34,9 +56,17 @@ impl Default for MyApp {
         Self {
             name: "world".to_string(),
             enum_instru: Instrument::Piano,
+            s: StepSequencer::new(120.0, 16, 44_100),
+            part_piano: [[false; 255]; 88],
+            part_flute: [[false; 255]; 88],
+            part_bass: [[false; 255]; 88],
+            part_pad: [[false; 255]; 88],
+            part_lead: [[false; 255]; 88],
         }
     }
 }
+
+
 
 impl eframe::App for MyApp {
     fn update(&mut self, ctx: &egui::Context, _frame:&mut eframe::Frame){
@@ -59,7 +89,7 @@ impl eframe::App for MyApp {
                 egui::ComboBox::from_id_salt("Instrument")
                     .selected_text(format!("{:?}",self.enum_instru))
                     .show_ui(ui, |ui| {
-                        if ui.button("Piano").clicked(){
+                     if ui.button("Piano").clicked(){
                             self.enum_instru = Instrument::Piano;
                         };
                         if ui.button("Flute").clicked(){
@@ -111,7 +141,53 @@ impl eframe::App for MyApp {
                 }
             });
             ui.separator();
-
+            ui.style_mut().visuals.extreme_bg_color = Color32::GRAY;
+            egui::Frame::none()
+                .fill(egui::Color32::GRAY)
+                .show(ui, |ui|  
+            {
+                if self.enum_instru == Instrument::Piano
+                {
+                    egui::Grid::new("partition_grid")
+                    .num_columns(255)
+                    .show(ui, |ui|
+                    {
+                        let mut nb_key = 0;
+                        for i in self.part_piano.iter_mut() //88 nb of keys
+                        {
+                            let nb_key_mod = nb_key % 12;
+                            ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::WHITE;
+                            if nb_key_mod == 1 || nb_key_mod == 4 || nb_key_mod == 6 
+                              || nb_key_mod == 9 || nb_key_mod == 11
+                            {
+                                ui.style_mut().visuals.widgets.inactive.weak_bg_fill = Color32::BLACK;
+                                ui.button("     ");
+                            }
+                            else 
+                            {
+                                ui.button("         ");
+                            }
+                            for j in i.iter_mut() //255
+                            {
+                                ui.toggle_value(j, "            ");
+                            }
+                            ui.end_row();
+                            nb_key += 1;
+                        }
+                    });
+                }
+            });
         });
     }
 }
+
+
+pub fn play_note(note: PianoNote, duration_secs: f32)
+{
+    let mut seq = StepSequencer::new(120.0,16,44_100);
+
+    play_sound(note, 1.0, &mut seq);
+    std::thread::sleep(Duration::from_secs_f32(duration_secs));
+    stop_sound(note, &mut seq);
+}
+
