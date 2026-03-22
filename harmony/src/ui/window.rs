@@ -152,6 +152,14 @@ impl MyApp {
                         ui.button("?");
                         ui.button("?");
                     });
+                if ui.button("Play").clicked()
+                {
+                    //play sound
+                }
+                if ui.button("Stop").clicked()
+                {
+                    //stop sound
+                }
                 ui.separator();
                 ui.label("sound test :");
                 if ui.button("All sound").clicked() {
