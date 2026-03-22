@@ -10,7 +10,9 @@ use crate::audio::note::{MidiNote, ALL_NOTES};
 use crate::audio::play::play;
 use crate::audio::instruments::InstrumentKind;
 use crate::sequencer::sequencer::StepSequencer;
+//====Change by Alex====\\
 use crate::files::save_to_json::{save_to_json, load_from_json, export_to_wav, Project, Track as SaveTrack, Step as SaveStep};
+//====Change by Alex====\\
 
 const BG: Color32 = Color32::from_rgb(18,18,20);
 const TOOLBAR_BG: Color32 = Color32::from_rgb(26,26,30);
@@ -146,10 +148,10 @@ impl MyApp {
     fn draw_toolbar(&mut self, ui: &mut egui::Ui, rect: Rect) {
         ui.allocate_ui_at_rect(rect, |ui| {
             ui.horizontal(|ui| {
+                //====Change by Alex====\\
                 egui::ComboBox::from_id_salt("Files")
                     .selected_text("Files")
                     .show_ui(ui, |ui| {
-                        //====Change by Alex====\\
                         if ui.button("Save").clicked() {
                             let project = self.build_project();
                             if let Err(e) = save_to_json(&project, "project.json") {
@@ -157,6 +159,10 @@ impl MyApp {
                             }
                         }
                         if ui.button("Import").clicked() {
+                            // Stop le stream avant d'écraser les grilles
+                            // pour éviter que le callback audio lise des données
+                            // en cours de modification (race condition / deadlock)
+                            self.stop_playback();
                             match load_from_json("project.json") {
                                 Ok(project) => self.load_project(project),
                                 Err(e)      => eprintln!("[load] {e}"),
@@ -168,8 +174,9 @@ impl MyApp {
                                 eprintln!("[export] {e}");
                             }
                         }
-                        //====Change by Alex====\\
                     });
+                //====Change by Alex====\\
+
                 egui::ComboBox::from_id_salt("Instrument")
                     .selected_text(format!("{:?}", self.enum_instru))
                     .show_ui(ui, |ui| {
@@ -189,6 +196,7 @@ impl MyApp {
                             self.enum_instru = InstrumentKind::Pad;
                         }
                     });
+
                 egui::ComboBox::from_id_salt("Effect")
                     .selected_text("Effect")
                     .show_ui(ui, |ui| {
@@ -213,6 +221,7 @@ impl MyApp {
 
                 ui.separator();
                 ui.label("sound test :");
+
                 //====Change by Alex====\\
                 if ui.button("All sound").clicked() {
                     let inst = self.enum_instru;
@@ -222,7 +231,11 @@ impl MyApp {
                         }
                     });
                 }
+
                 if ui.button("Clear track").clicked() {
+                    // Stop le stream avant de modifier les grilles
+                    // pour éviter une race condition avec le callback cpal
+                    self.stop_playback();
                     let part: &mut Grid = match self.enum_instru {
                         InstrumentKind::Piano => &mut self.part_piano,
                         InstrumentKind::Flute => &mut self.part_flute,
@@ -549,75 +562,40 @@ impl MyApp {
             );
         }
     }
-
-    fn draw_grid(&mut self, ui:&mut egui::Ui, rect:Rect) {
+fn draw_grid(&mut self, ui:&mut egui::Ui, rect:Rect) {
         let page_start = self.piano_page * NOTES_PER_PAGE;
         let page_end = (page_start + NOTES_PER_PAGE).min(88);
-        let n_visible = page_end - page_start;
-
-        //====Change by Alex====\\
-        let row_h = rect.height() / n_visible as f32;
-        let col_w = rect.width() / STEP_COUNT as f32;
-        //====Change by Alex====\\
-
+ 
         ui.painter().rect_filled(rect,Rounding::ZERO,GRID_BG);
-
+ 
         //====Change by Alex====\\
-        let part: &mut Grid = match self.enum_instru {
-            InstrumentKind::Piano => &mut self.part_piano,
-            InstrumentKind::Flute => &mut self.part_flute,
-            InstrumentKind::Bass  => &mut self.part_bass,
-            InstrumentKind::Pad   => &mut self.part_pad,
-            InstrumentKind::Lead  => &mut self.part_lead,
-        };
-
-        for row in 0..n_visible {
-            let note_idx = page_start + row;
-            let midi     = ALL_NOTES[note_idx].midi();
-            let y        = rect.min.y + row as f32 * row_h;
-
-            let row_bg = if is_black(midi) {
-                Color32::from_rgb(24, 24, 28)
-            } else {
-                Color32::from_rgb(32, 32, 37)
+        ui.allocate_ui_at_rect(rect, |ui| {
+            let part: &mut Grid = match self.enum_instru {
+                InstrumentKind::Piano => &mut self.part_piano,
+                InstrumentKind::Flute => &mut self.part_flute,
+                InstrumentKind::Bass  => &mut self.part_bass,
+                InstrumentKind::Pad   => &mut self.part_pad,
+                InstrumentKind::Lead  => &mut self.part_lead,
             };
-            ui.painter().rect_filled(
-                Rect::from_min_size(Pos2::new(rect.min.x, y), vec2(rect.width(), row_h)),
-                Rounding::ZERO,
-                row_bg,
-            );
-
-            for step_idx in 0..STEP_COUNT {
-                let x         = rect.min.x + step_idx as f32 * col_w;
-                let cell_rect = Rect::from_min_size(
-                    Pos2::new(x + 1.0, y + 1.0),
-                    vec2(col_w - 2.0, row_h - 2.0),
-                );
-
-                let is_active = part[note_idx][step_idx].is_some();
-                ui.painter().rect_filled(cell_rect, Rounding::same(2),
-                    if is_active { STEP_ON } else { STEP_OFF });
-
-                if is_active && col_w > 20.0 {
-                    ui.painter().text(
-                        cell_rect.center(),
-                        egui::Align2::CENTER_CENTER,
-                        ALL_NOTES[note_idx].name(),
-                        egui::FontId::proportional((row_h * 0.4).min(8.0)),
-                        Color32::WHITE,
-                    );
-                }
-
-                let resp = ui.allocate_rect(cell_rect, Sense::click());
-                if resp.clicked() {
-                    part[note_idx][step_idx] = if is_active {
-                        None
-                    } else {
-                        Some(midi)
-                    };
-                }
-            }
-        }
+ 
+            egui::Grid::new("partition_grid")
+                .num_columns(STEP_COUNT)
+                .spacing(vec2(2.0, 2.0))
+                .show(ui, |ui| {
+                    for note_idx in page_start..page_end {
+                        let midi = ALL_NOTES[note_idx].midi();
+                        for step_idx in 0..STEP_COUNT {
+                            // Convertit Option<u8> en bool pour toggle_value
+                            // puis remet à jour la grille selon le résultat
+                            let mut active = part[note_idx][step_idx].is_some();
+                            if ui.toggle_value(&mut active, " ").changed() {
+                                part[note_idx][step_idx] = if active { Some(midi) } else { None };
+                            }
+                        }
+                        ui.end_row();
+                    }
+                });
+        });
         //====Change by Alex====\\
     }
 }
