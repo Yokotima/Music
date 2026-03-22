@@ -1,57 +1,4 @@
-
-///
-/// Step Sequencer — intégration avec InstrumentEngine
-///
-/// ## Architecture
-///
-/// ```
-/// StepSequencer
-/// ├── tracks: Vec<Track>        — une ligne par instrument actif
-/// │   └── Track
-/// │       ├── engine: InstrumentEngine   — synthé dédié à cette piste
-/// │       ├── steps: Vec<Step>           — grille on/off, note, vélocité
-/// │       └── default_note: u8           — note MIDI jouée sur chaque step actif
-/// ├── bpm: f32
-/// ├── step_count: usize         — nombre de pas (1–64, défaut 16)
-/// ├── current_step: usize       — pas en cours de lecture
-/// ├── sample_clock: u32         — échantillons écoulés depuis le début du step actuel
-/// └── samples_per_step: u32     — recalculé à chaque changement de BPM
-/// ```
-///
-/// ## Intégration cpal
-///
-/// `StepSequencer::next_sample()` est la seule fonction à appeler
-/// depuis le callback audio. Elle :
-///   1. Avance l'horloge interne
-///   2. Déclenche note_on / note_off au bon moment sur chaque piste
-///   3. Somme et retourne un échantillon f32 prêt à écrire dans le buffer cpal
-///
-/// ## Exemple d'utilisation (dans audio_engine.rs)
-///
-/// ```rust
-/// let mut seq = StepSequencer::new(120.0, 16, SAMPLE_RATE);
-///
-/// // Piste 0 — kick sur les temps 0, 4, 8, 12
-/// seq.add_track(InstrumentKind::Bass, 36);         // C2 = kick MIDI convention
-/// seq.set_step(0, 0, true);
-/// seq.set_step(0, 4, true);
-/// seq.set_step(0, 8, true);
-/// seq.set_step(0, 12, true);
-///
-/// // Piste 1 — mélodie lead
-/// seq.add_track(InstrumentKind::Lead, 60);         // C4
-/// seq.set_step(1, 0, true);
-/// seq.set_step_note(1, 4, 64u8);                   // E4 sur le step 4
-/// seq.set_step(1, 8, true);
-///
-/// // Dans le callback cpal :
-/// let sample = seq.next_sample();
-/// ```
 use crate::audio::instruments::{InstrumentEngine, InstrumentKind};
-
-// ═══════════════════════════════════════════════════════
-// Constantes
-// ═══════════════════════════════════════════════════════
 
 /// Durée d'une note comme fraction d'un step.
 /// 0.8 = la note dure 80 % du step, laissant 20 % de silence entre les pas.
@@ -64,11 +11,9 @@ pub const MAX_STEPS: usize          = 64;
 pub const MIN_BPM: f32              = 40.0;
 pub const MAX_BPM: f32              = 300.0;
 
-// ═══════════════════════════════════════════════════════
-// Step — une case de la grille
-// ═══════════════════════════════════════════════════════
 
-/// Une case dans la grille du séquenceur.
+// Step — une case de la grille
+
 #[derive(Debug, Clone, Copy)]
 pub struct Step
 {
@@ -91,9 +36,8 @@ impl Step
     }
 }
 
-// ═══════════════════════════════════════════════════════
 // Track — une ligne de la grille
-// ═══════════════════════════════════════════════════════
+
 
 /// Une piste = un instrument + une grille de N steps.
 pub struct Track
@@ -140,9 +84,7 @@ impl Track
     }
 }
 
-// ═══════════════════════════════════════════════════════
 // StepSequencer
-// ═══════════════════════════════════════════════════════
 
 /// Séquenceur à pas — gère N pistes et avance automatiquement dans le callback audio.
 pub struct StepSequencer
@@ -178,14 +120,7 @@ pub struct StepSequencer
 
 impl StepSequencer
 {
-    // ── Construction ──────────────────────────────────────────────────
 
-    /// Crée un séquenceur vide.
-    ///
-    /// # Arguments
-    /// * `bpm`         — tempo initial
-    /// * `step_count`  — nombre de pas (1–64)
-    /// * `sample_rate` — fréquence d'échantillonnage du moteur audio
     pub fn new(bpm: f32, step_count: usize, sample_rate: u32) -> Self
     {
         let step_count = step_count.clamp(MIN_STEPS, MAX_STEPS);
@@ -218,16 +153,6 @@ impl StepSequencer
         (beat_samples / steps_per_beat).round() as u32
     }
 
-    // ── Gestion des pistes ────────────────────────────────────────────
-
-    /// Ajoute une piste pour un instrument donné.
-    ///
-    /// # Arguments
-    /// * `kind`         — type d'instrument
-    /// * `default_note` — note MIDI jouée par défaut (ex : 36 = kick, 60 = C4)
-    ///
-    /// # Returns
-    /// Index de la piste créée.
     pub fn add_track(&mut self, kind: InstrumentKind, default_note: u8) -> usize
     {
         let track = Track::new(kind, self.step_count, default_note, self.sample_rate);
@@ -235,7 +160,6 @@ impl StepSequencer
         self.tracks.len() - 1
     }
 
-    /// Supprime une piste par index. Coupe d'abord toute note active.
     pub fn remove_track(&mut self, track_idx: usize)
     {
         if track_idx < self.tracks.len()
@@ -248,10 +172,6 @@ impl StepSequencer
         }
     }
 
-    // ── Modification de la grille ────────────────────────────────────
-
-    /// Active ou désactive un step.
-    /// Les indices invalides sont ignorés silencieusement.
     pub fn set_step(&mut self, track_idx: usize, step_idx: usize, active: bool)
     {
         if let Some(track) = self.tracks.get_mut(track_idx)
@@ -263,8 +183,7 @@ impl StepSequencer
         }
     }
 
-    /// Change la note MIDI d'un step spécifique et l'active automatiquement.
-    /// Passe `None` pour revenir à la note par défaut de la piste.
+
     pub fn set_step_note(&mut self, track_idx: usize, step_idx: usize, note: impl Into<Option<u8>>)
     {
         if let Some(track) = self.tracks.get_mut(track_idx)
@@ -272,12 +191,12 @@ impl StepSequencer
             if let Some(step) = track.steps.get_mut(step_idx)
             {
                 step.note   = note.into();
-                step.active = true; // assigner une note active le step
+                step.active = true; 
             }
         }
     }
 
-    /// Change la vélocité d'un step spécifique [0.0–1.0].
+
     pub fn set_step_velocity(&mut self, track_idx: usize, step_idx: usize, velocity: f32)
     {
         if let Some(track) = self.tracks.get_mut(track_idx)
@@ -304,9 +223,7 @@ impl StepSequencer
         for i in 0..self.tracks.len() { self.clear_track(i); }
     }
 
-    // ── Paramètres de transport ──────────────────────────────────────
 
-    /// Change le BPM à la volée (prend effet dès le prochain step).
     pub fn set_bpm(&mut self, bpm: f32)
     {
         self.bpm             = bpm.clamp(MIN_BPM, MAX_BPM);
