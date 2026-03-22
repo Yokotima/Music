@@ -2,7 +2,7 @@
 
 > A Digital Audio Workstation (DAW) for Linux, built in Rust
 
-**EPITA S4 Project - Academic Year 2024-2025**
+**EPITA S4 Project - Academic Year 2025-2026**
 
 ---
 
