@@ -1,2 +1,12 @@
-Merge all branch to main 
-		~Alexandre
+How to use ?
+
+Step 1 : 
+	- Use Cargo build
+	- And Cargo run window
+
+Step 2 : 
+	- Try all the buton for create sound
+	- Once finish, juste save the project
+
+Step 3 : 
+	- Cargo clean (For clean the repo)
