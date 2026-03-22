@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 use hound;
 use std::f32::consts::PI;
+use crate::audio::instruments::InstrumentKind;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Project {
@@ -12,15 +13,6 @@ pub struct Project {
     pub version: String,
     pub description: String,
     pub tracks: Vec<Track>,    
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub enum InstrumentKind {
-    Piano,
-    Flute,
-    Bass,
-    Pad,
-    Lead,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

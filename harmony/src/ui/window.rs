@@ -1,10 +1,16 @@
 use eframe::egui;
 use eframe::egui::{Color32, Pos2, Rect, Rounding, Sense, Stroke, StrokeKind, vec2};
+use std::sync::{Arc, Mutex};
+
+use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
+use cpal::{BufferSize, SampleRate, StreamConfig};
 
 use crate::audio::piano_test;
 use crate::audio::note::{MidiNote, ALL_NOTES};
 use crate::audio::play::play;
 use crate::audio::instruments::InstrumentKind;
+use crate::sequencer::sequencer::StepSequencer;
+use crate::files::save_to_json::{save_to_json, load_from_json, export_to_wav, Project, Track as SaveTrack, Step as SaveStep};
 
 const BG: Color32 = Color32::from_rgb(18,18,20);
 const TOOLBAR_BG: Color32 = Color32::from_rgb(26,26,30);
@@ -14,6 +20,16 @@ const DIVIDER: Color32 = Color32::from_rgb(55,55,62);
 
 const WHITE_KEY: Color32 = Color32::from_rgb(238,235,230);
 const BLACK_KEY: Color32 = Color32::from_rgb(28,28,32);
+
+//====Change by Alex====\\
+const STEP_ON:  Color32 = Color32::from_rgb(80, 160, 255);
+const STEP_OFF: Color32 = Color32::from_rgb(45, 45, 52);
+
+const STEP_COUNT:  usize = 64;
+const SAMPLE_RATE: u32   = 44_100;
+
+type Grid = [[Option<u8>; STEP_COUNT]; 88];
+//====Change by Alex====\\
 
 const PIANO_W: f32 = 72.0;
 const NAV_H: f32 = 28.0;
@@ -29,11 +45,17 @@ struct MyApp {
     enum_instru: InstrumentKind,
     piano_page: usize,
 
-    part_piano: [[bool;255];88],
-    part_flute: [[bool;255];88],
-    part_bass: [[bool;255];88],
-    part_pad: [[bool;255];88],
-    part_lead: [[bool;255];88],
+    //====Change by Alex====\\
+    part_piano: Grid,
+    part_flute: Grid,
+    part_bass:  Grid,
+    part_pad:   Grid,
+    part_lead:  Grid,
+
+    sequencer:  Arc<Mutex<StepSequencer>>,
+    _stream:    Option<cpal::Stream>,
+    is_playing: bool,
+    //====Change by Alex====\\
 }
 
 impl Default for MyApp {
@@ -42,11 +64,17 @@ impl Default for MyApp {
             enum_instru: InstrumentKind::Piano,
             piano_page: 0,
 
-            part_piano: [[false;255];88],
-            part_flute: [[false;255];88],
-            part_bass: [[false;255];88],
-            part_pad: [[false;255];88],
-            part_lead: [[false;255];88],
+            //====Change by Alex====\\
+            part_piano: [[None; STEP_COUNT]; 88],
+            part_flute: [[None; STEP_COUNT]; 88],
+            part_bass:  [[None; STEP_COUNT]; 88],
+            part_pad:   [[None; STEP_COUNT]; 88],
+            part_lead:  [[None; STEP_COUNT]; 88],
+
+            sequencer:  Arc::new(Mutex::new(StepSequencer::new(60.0, STEP_COUNT, SAMPLE_RATE))),
+            _stream:    None,
+            is_playing: false,
+            //====Change by Alex====\\
         }
     }
 }
@@ -121,9 +149,26 @@ impl MyApp {
                 egui::ComboBox::from_id_salt("Files")
                     .selected_text("Files")
                     .show_ui(ui, |ui| {
-                        ui.button("Save");
-                        ui.button("Import");
-                        ui.button("Export");
+                        //====Change by Alex====\\
+                        if ui.button("Save").clicked() {
+                            let project = self.build_project();
+                            if let Err(e) = save_to_json(&project, "project.json") {
+                                eprintln!("[save] {e}");
+                            }
+                        }
+                        if ui.button("Import").clicked() {
+                            match load_from_json("project.json") {
+                                Ok(project) => self.load_project(project),
+                                Err(e)      => eprintln!("[load] {e}"),
+                            }
+                        }
+                        if ui.button("Export").clicked() {
+                            let project = self.build_project();
+                            if let Err(e) = export_to_wav(&project, "project.wav") {
+                                eprintln!("[export] {e}");
+                            }
+                        }
+                        //====Change by Alex====\\
                     });
                 egui::ComboBox::from_id_salt("Instrument")
                     .selected_text(format!("{:?}", self.enum_instru))
@@ -152,37 +197,230 @@ impl MyApp {
                         ui.button("?");
                         ui.button("?");
                     });
+
+                //====Change by Alex====\\
                 if ui.button("Play").clicked()
                 {
                     //play sound
+                    self.start_playback();
                 }
                 if ui.button("Stop").clicked()
                 {
                     //stop sound
+                    self.stop_playback();
                 }
+                //====Change by Alex====\\
+
                 ui.separator();
                 ui.label("sound test :");
+                //====Change by Alex====\\
                 if ui.button("All sound").clicked() {
-                    piano_test::run_all_notes();
+                    let inst = self.enum_instru;
+                    std::thread::spawn(move || {
+                        for &note in &ALL_NOTES {
+                            play(note, inst, 0.4);
+                        }
+                    });
                 }
+                if ui.button("Clear track").clicked() {
+                    let part: &mut Grid = match self.enum_instru {
+                        InstrumentKind::Piano => &mut self.part_piano,
+                        InstrumentKind::Flute => &mut self.part_flute,
+                        InstrumentKind::Bass  => &mut self.part_bass,
+                        InstrumentKind::Pad   => &mut self.part_pad,
+                        InstrumentKind::Lead  => &mut self.part_lead,
+                    };
+                    for row in part.iter_mut() {
+                        for step in row.iter_mut() {
+                            *step = None;
+                        }
+                    }
+                }
+                //====Change by Alex====\\
             });
         });
     }
+
+    //====Change by Alex====\\
+    fn build_project(&self) -> Project
+    {
+        let instruments: [(InstrumentKind, &Grid); 5] = [
+            (InstrumentKind::Piano, &self.part_piano),
+            (InstrumentKind::Flute, &self.part_flute),
+            (InstrumentKind::Bass,  &self.part_bass),
+            (InstrumentKind::Pad,   &self.part_pad),
+            (InstrumentKind::Lead,  &self.part_lead),
+        ];
+
+        let mut tracks = Vec::new();
+
+        for (kind, grid) in &instruments {
+            let mut steps = Vec::new();
+
+            for step_idx in 0..STEP_COUNT {
+                let mut found: Option<u8> = None;
+                for note_idx in 0..88 {
+                    if let Some(midi) = grid[note_idx][step_idx] {
+                        found = Some(midi);
+                        break;
+                    }
+                }
+                steps.push(SaveStep {
+                    active:   found.is_some(),
+                    note:     found,
+                    velocity: None,
+                });
+            }
+
+            tracks.push(SaveTrack {
+                engine:           *kind,
+                steps,
+                default_note:     60,
+                default_velocity: 0.8,
+                muted:            false,
+            });
+        }
+
+        Project {
+            name:        "Harmony Project".to_string(),
+            version:     "1.0".to_string(),
+            description: "".to_string(),
+            tracks,
+        }
+    }
+
+    fn load_project(&mut self, project: Project)
+    {
+        self.part_piano = [[None; STEP_COUNT]; 88];
+        self.part_flute = [[None; STEP_COUNT]; 88];
+        self.part_bass  = [[None; STEP_COUNT]; 88];
+        self.part_pad   = [[None; STEP_COUNT]; 88];
+        self.part_lead  = [[None; STEP_COUNT]; 88];
+
+        for track in project.tracks {
+            let grid: &mut Grid = match track.engine {
+                InstrumentKind::Piano => &mut self.part_piano,
+                InstrumentKind::Flute => &mut self.part_flute,
+                InstrumentKind::Bass  => &mut self.part_bass,
+                InstrumentKind::Pad   => &mut self.part_pad,
+                InstrumentKind::Lead  => &mut self.part_lead,
+            };
+
+            for (step_idx, step) in track.steps.iter().enumerate() {
+                if step_idx >= STEP_COUNT { break; }
+                if !step.active { continue; }
+
+                if let Some(midi) = step.note {
+                    for note_idx in 0..88 {
+                        if ALL_NOTES[note_idx].midi() == midi {
+                            grid[note_idx][step_idx] = Some(midi);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    fn start_playback(&mut self)
+    {
+        {
+            let mut seq = self.sequencer.lock().unwrap();
+            seq.stop();
+            seq.tracks.clear();
+
+            let instruments: [InstrumentKind; 5] = [
+                InstrumentKind::Piano,
+                InstrumentKind::Flute,
+                InstrumentKind::Bass,
+                InstrumentKind::Pad,
+                InstrumentKind::Lead,
+            ];
+            let grids: [&Grid; 5] = [
+                &self.part_piano,
+                &self.part_flute,
+                &self.part_bass,
+                &self.part_pad,
+                &self.part_lead,
+            ];
+
+            for (kind, grid) in instruments.iter().zip(grids.iter()) {
+                let has_notes = grid.iter().any(|row| row.iter().any(|s| s.is_some()));
+                if !has_notes { continue; }
+
+                let track_idx = seq.add_track(*kind, 60);
+
+                for step_idx in 0..STEP_COUNT {
+                    for note_idx in 0..88 {
+                        if let Some(midi) = grid[note_idx][step_idx] {
+                            seq.set_step_note(track_idx, step_idx, midi);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            seq.looping = false;
+            seq.play();
+        }
+
+        let seq_clone = Arc::clone(&self.sequencer);
+
+        let host   = cpal::default_host();
+        let device = match host.default_output_device() {
+            Some(d) => d,
+            None    => { eprintln!("[play] No output device"); return; }
+        };
+
+        let config = StreamConfig {
+            channels:    2,
+            sample_rate: SampleRate(SAMPLE_RATE),
+            buffer_size: BufferSize::Fixed(1024),
+        };
+
+        let stream = device.build_output_stream(
+            &config,
+            move |output: &mut [f32], _: &cpal::OutputCallbackInfo| {
+                let mut seq = seq_clone.lock().unwrap();
+                for frame in output.chunks_mut(2) {
+                    let sample = seq.next_sample();
+                    for ch in frame.iter_mut() { *ch = sample; }
+                }
+            },
+            |err| eprintln!("[play] Stream error: {err}"),
+            None,
+        ).unwrap();
+
+        stream.play().unwrap();
+        self._stream   = Some(stream);
+        self.is_playing = true;
+    }
+
+    fn stop_playback(&mut self)
+    {
+        {
+            let mut seq = self.sequencer.lock().unwrap();
+            seq.stop();
+        }
+        self._stream   = None;
+        self.is_playing = false;
+    }
+    //====Change by Alex====\\
 
     fn draw_piano(&mut self, ui:&mut egui::Ui, rect:Rect) {
         let page_start = self.piano_page * NOTES_PER_PAGE;
         let page_end = (page_start + NOTES_PER_PAGE).min(88);
 
         let visible = &ALL_NOTES[page_start..page_end];
-	let n_visible  = page_end - page_start;
+        let n_visible  = page_end - page_start;
 
         let nav_rect = Rect::from_min_size(rect.min,vec2(PIANO_W,NAV_H));
-	let keys_top  = rect.min.y + NAV_H;
-    	let keys_rect = Rect::from_min_max(Pos2::new(rect.min.x, keys_top), rect.max);
+        let keys_top  = rect.min.y + NAV_H;
+        let keys_rect = Rect::from_min_max(Pos2::new(rect.min.x, keys_top), rect.max);
 
-    	let row_h   = keys_rect.height() / n_visible as f32;
-    	let black_w = PIANO_W * BLACK_W_FRAC;
-    	let btn_w   = PIANO_W / 4.0;
+        let row_h   = keys_rect.height() / n_visible as f32;
+        let black_w = PIANO_W * BLACK_W_FRAC;
+        let btn_w   = PIANO_W / 4.0;
 
         let mut clicked_page = None;
 
@@ -315,28 +553,72 @@ impl MyApp {
     fn draw_grid(&mut self, ui:&mut egui::Ui, rect:Rect) {
         let page_start = self.piano_page * NOTES_PER_PAGE;
         let page_end = (page_start + NOTES_PER_PAGE).min(88);
+        let n_visible = page_end - page_start;
+
+        //====Change by Alex====\\
+        let row_h = rect.height() / n_visible as f32;
+        let col_w = rect.width() / STEP_COUNT as f32;
+        //====Change by Alex====\\
 
         ui.painter().rect_filled(rect,Rounding::ZERO,GRID_BG);
-        ui.allocate_ui_at_rect(rect, |ui| {
-            let part = match self.enum_instru {
-                InstrumentKind::Piano => &mut self.part_piano,
-                InstrumentKind::Flute => &mut self.part_flute,
-                InstrumentKind::Bass => &mut self.part_bass,
-                InstrumentKind::Pad => &mut self.part_pad,
-                InstrumentKind::Lead => &mut self.part_lead,
-            };
 
-            egui::Grid::new("partition_grid")
-                .num_columns(255)
-                .show(ui, |ui| {
-                    for note_idx in page_start..page_end {
-                        for step in part[note_idx].iter_mut() {
-                            ui.toggle_value(step, "  ");
-                        }
-                ui.end_row();
+        //====Change by Alex====\\
+        let part: &mut Grid = match self.enum_instru {
+            InstrumentKind::Piano => &mut self.part_piano,
+            InstrumentKind::Flute => &mut self.part_flute,
+            InstrumentKind::Bass  => &mut self.part_bass,
+            InstrumentKind::Pad   => &mut self.part_pad,
+            InstrumentKind::Lead  => &mut self.part_lead,
+        };
+
+        for row in 0..n_visible {
+            let note_idx = page_start + row;
+            let midi     = ALL_NOTES[note_idx].midi();
+            let y        = rect.min.y + row as f32 * row_h;
+
+            let row_bg = if is_black(midi) {
+                Color32::from_rgb(24, 24, 28)
+            } else {
+                Color32::from_rgb(32, 32, 37)
+            };
+            ui.painter().rect_filled(
+                Rect::from_min_size(Pos2::new(rect.min.x, y), vec2(rect.width(), row_h)),
+                Rounding::ZERO,
+                row_bg,
+            );
+
+            for step_idx in 0..STEP_COUNT {
+                let x         = rect.min.x + step_idx as f32 * col_w;
+                let cell_rect = Rect::from_min_size(
+                    Pos2::new(x + 1.0, y + 1.0),
+                    vec2(col_w - 2.0, row_h - 2.0),
+                );
+
+                let is_active = part[note_idx][step_idx].is_some();
+                ui.painter().rect_filled(cell_rect, Rounding::same(2),
+                    if is_active { STEP_ON } else { STEP_OFF });
+
+                if is_active && col_w > 20.0 {
+                    ui.painter().text(
+                        cell_rect.center(),
+                        egui::Align2::CENTER_CENTER,
+                        ALL_NOTES[note_idx].name(),
+                        egui::FontId::proportional((row_h * 0.4).min(8.0)),
+                        Color32::WHITE,
+                    );
                 }
-            });
-        });
+
+                let resp = ui.allocate_rect(cell_rect, Sense::click());
+                if resp.clicked() {
+                    part[note_idx][step_idx] = if is_active {
+                        None
+                    } else {
+                        Some(midi)
+                    };
+                }
+            }
+        }
+        //====Change by Alex====\\
     }
 }
 
