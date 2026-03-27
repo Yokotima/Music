@@ -296,7 +296,7 @@ impl StepSequencer
     ///
     /// À appeler exactement une fois par échantillon dans la boucle cpal.
     #[inline(always)]
-    pub fn next_sample(&mut self) -> f32
+    pub fn next_sample(&mut self) -> (f32, f32)
     {
         if self.playing
         {
@@ -385,14 +385,17 @@ impl StepSequencer
 
     // Somme les échantillons de toutes les pistes.
     #[inline(always)]
-    fn sum_voices(&mut self) -> f32
+    fn sum_voices(&mut self) -> (f32, f32)
     {
-        let mut sum = 0.0_f32;
+        let mut sum_l = 0.0_f32;
+        let mut sum_r = 0.0_f32;
         for track in self.tracks.iter_mut()
         {
-            sum += track.engine.next_sample();
+            let (v_l, v_r) = track.engine.next_sample(); // Get stereo from engine
+            sum_l += v_l;
+            sum_r += v_r;
         }
-        sum
+        (sum_l, sum_r)
     }
 }
 

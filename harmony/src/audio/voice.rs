@@ -28,7 +28,8 @@ pub fn midi_to_freq(note: u8) -> f32
 pub struct Voice
 {
     pub oscillator:Oscillator,
-    pub filter:BiquadFilter,
+    pub filter_l:BiquadFilter,
+    pub filter_r:BiquadFilter,
     pub envelope:Envelope,
     pub note:u8,
     pub velocity:f32,
@@ -44,7 +45,8 @@ impl Voice
         Self
         {
             oscillator:Oscillator::new(440.0, sample_rate, waveform),
-            filter:BiquadFilter::new(sample_rate),
+            filter_l:BiquadFilter::new(sample_rate),
+            filter_r:BiquadFilter::new(sample_rate),
             envelope:Envelope::new(sample_rate),
             note:255,
             velocity:0.0,
@@ -58,7 +60,8 @@ impl Voice
     {
         let freq = midi_to_freq(note);
         self.oscillator.set_frequency(freq);
-        self.filter.reset();   // clear delay lines to avoid residual noise
+        self.filter_l.reset();   // clear delay lines to avoid residual noise
+        self.filter_r.reset();
         self.envelope.note_on(params);
         self.note = note;
         self.velocity = velocity.clamp(0.0, 1.0);
@@ -76,27 +79,35 @@ impl Voice
     // Takes ADSR params. Returns one audio sample: oscillator shaped by filter and envelope.
     // Returns 0.0 immediately if the voice is inactive.
     #[inline(always)]
-    fn next_sample(&mut self, params: &EnvelopeParams) -> f32
+    fn next_sample(&mut self, params: &EnvelopeParams) -> (f32, f32)
     {
         if !self.active
         {
-            return 0.0;
+            return (0.0, 0.0);
         }
 
-        let osc_out = self.oscillator.next_sample();
-        let filtered_out = self.filter.process(osc_out);  // ← filter in chain
+        let (osc_l, osc_r) = self.oscillator.next_sample();
+        let filtered_l = self.filter_l.process(osc_l);
+        let filtered_r = self.filter_r.process(osc_r);
+        
         let amp = self.envelope.next_sample(params);
         self.age += 1;
 
         if self.envelope.is_idle()
         {
             self.active = false;
-            self.note   = 255;
+            self.note = 255;
         }
-        let vel_amp = self.velocity * self.velocity;
-        let out = filtered_out * amp * vel_amp;
 
-        out.tanh()
+        let vel_amp = self.velocity * self.velocity;
+        
+        let out_l = filtered_l * amp * vel_amp;
+        let out_r = filtered_r * amp * vel_amp;
+
+        let final_l = if out_l > 1.0 { 1.0 } else if out_l < -1.0 { -1.0 } else { out_l - (out_l.powi(3) / 3.0) };
+        let final_r = if out_r > 1.0 { 1.0 } else if out_r < -1.0 { -1.0 } else { out_r - (out_r.powi(3) / 3.0) };
+
+        (final_l, final_r)
     }
 }
 
@@ -129,7 +140,8 @@ impl VoicePool
     {
         for v in self.voices.iter_mut()
         {
-            v.filter.set_params(preset.filter_type, preset.cutoff_hz, preset.q);
+            v.filter_l.set_params(preset.filter_type, preset.cutoff_hz, preset.q);
+            v.filter_r.set_params(preset.filter_type, preset.cutoff_hz, preset.q);
         }
     }
 
@@ -159,14 +171,17 @@ impl VoicePool
 
     // Takes nothing. Returns one audio sample — the sum of all active voices.
     #[inline(always)]
-    pub fn next_sample(&mut self) -> f32
+    pub fn next_sample(&mut self) -> (f32, f32)
     {
-        let mut sum = 0.0_f32;
+        let mut sum_l = 0.0_f32;
+        let mut sum_r = 0.0_f32;
         for voice in self.voices.iter_mut()
         {
-            sum += voice.next_sample(&self.params);
+            let (v_l, v_r) = voice.next_sample(&self.params);
+            sum_l += v_l;
+            sum_r += v_r;
         }
-        sum * MASTER_GAIN
+        (sum_l * MASTER_GAIN, sum_r * MASTER_GAIN)
     }
 
     // Takes nothing. Returns how many voices are currently active (playing or in release).

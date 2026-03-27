@@ -10,30 +10,30 @@ pub fn config() -> Instrument
     {
         kind: InstrumentKind::Piano,
 
-        waveform: Waveform::Triangle,
+        waveform: Waveform::KarplusStrong,
 
         envelope: EnvelopeParams
         {
-            attack_secs: 0.002,
-            decay_secs: 1.8, 
+            attack_secs: 0.005,
+            decay_secs: 2.5, 
             sustain_level: 0.0,
-            release_secs: 0.3,
+            release_secs: 0.4,
         },
 
         filter: FilterPreset
         {
             filter_type: FilterType::LowPass,
-            cutoff_hz: 4_000.0,
-            q: 0.707, 
+            cutoff_hz: 6000.0,
+            q: 0.5, 
         },
 
         effects: EffectConfig
         {
-            delay_ms: 0.0,
-            feedback: 0.0,
-            delay_wet: 0.0,
-            room_size: 0.45,
-            reverb_wet: 0.08,
+            delay_ms: 375.0,
+            feedback: 0.2,
+            delay_wet: 0.1,
+            room_size: 0.85,
+            reverb_wet: 0.25,
         },
     }
 }

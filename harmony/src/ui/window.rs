@@ -394,10 +394,14 @@ impl MyApp {
         let stream = device.build_output_stream(
             &config,
             move |output: &mut [f32], _: &cpal::OutputCallbackInfo| {
-                let mut seq = seq_clone.lock().unwrap();
-                for frame in output.chunks_mut(2) {
-                    let sample = seq.next_sample();
-                    for ch in frame.iter_mut() { *ch = sample; }
+                if let Ok(mut s) = seq_clone.lock() {
+                    for frame in output.chunks_mut(2) {
+                        let (l, r) = s.next_sample(); 
+                        if frame.len() >= 2 {
+                            frame[0] = l; // Left channel
+                            frame[1] = r; // Right channel
+                        }
+                    }
                 }
             },
             |err| eprintln!("[play] Stream error: {err}"),
