@@ -142,8 +142,12 @@ fn build_stream(seq: Arc<Mutex<StepSequencer>>) -> Result<cpal::Stream>
             let mut s = seq.lock().unwrap();
             for frame in output.chunks_mut(2)
             {
-                let sample = s.next_sample();
-                for ch in frame.iter_mut() { *ch = sample; }
+                let (l, r) = s.next_sample();
+
+                if frame.len() >= 2 {
+                    frame[0] = l;
+                    frame[1] = r;
+                }
             }
         },
         |err| eprintln!("[play] Stream error: {err}"),

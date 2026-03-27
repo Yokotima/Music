@@ -127,8 +127,10 @@ impl Delay
 
 const NUM_COMBS: usize = 4;
 const NUM_ALLPASS: usize = 2;
-const COMB_DELAYS: [usize; NUM_COMBS] = [1557, 1617, 1491, 1422];
-const ALLPASS_DELAYS: [usize; NUM_ALLPASS] = [225, 556];
+//const COMB_DELAYS: [usize; NUM_COMBS] = [1557, 1617, 1491, 1422];
+//const ALLPASS_DELAYS: [usize; NUM_ALLPASS] = [225, 556];
+const COMB_DELAYS: [usize; NUM_COMBS] = [1601, 1861, 2351, 2503]; 
+const ALLPASS_DELAYS: [usize; NUM_ALLPASS] = [557, 227];
 const ALLPASS_FEEDBACK: f32 = 0.5;
 
 struct CombFilter
@@ -295,10 +297,18 @@ impl EffectsChain
 
     // Takes one audio sample. Runs it through Delay then Reverb. Returns the processed sample.
     #[inline(always)]
-    pub fn process(&mut self, input: f32) -> f32
+    pub fn process(&mut self, input: (f32, f32)) -> (f32, f32)
     {
-        let after_delay  = self.delay.process(input);
-        let after_reverb = self.reverb.process(after_delay);
-        after_reverb
+        let (in_l, in_r) = input;
+
+        // Process Left channel
+        let after_delay_l = self.delay.process(in_l);
+        let out_l = self.reverb.process(after_delay_l);
+
+        // Process Right channel
+        let after_delay_r = self.delay.process(in_r);
+        let out_r = self.reverb.process(after_delay_r);
+
+        (out_l, out_r)
     }
 }

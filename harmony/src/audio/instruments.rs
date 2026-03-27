@@ -132,7 +132,7 @@ impl InstrumentEngine
     // Takes nothing. Returns one audio sample: voices summed, then effects applied.
     // Called 44 100 times per second from the cpal callback.
     #[inline(always)]
-    pub fn next_sample(&mut self) -> f32
+    pub fn next_sample(&mut self) -> (f32, f32)
     {
         let dry = self.pool.next_sample();
         self.fx.process(dry)
