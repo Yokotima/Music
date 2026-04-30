@@ -16,7 +16,7 @@ use super::oscillator::{
 };
 
 pub const MAX_VOICES: usize = 32;
-const MASTER_GAIN: f32 = 1.0 / (MAX_VOICES as f32 / 4.0);
+const MASTER_GAIN: f32 = 0.25;
 
 // Takes a MIDI note number [0-127]. Returns the frequency in Hz.
 pub fn midi_to_freq(note: u8) -> f32
