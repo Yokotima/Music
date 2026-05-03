@@ -192,10 +192,10 @@ impl MyApp {
                 egui::ComboBox::from_id_salt("Effect")
                     .selected_text("Effect")
                     .show_ui(ui, |ui| {
+                        ui.button("None");
+                        ui.button("Wet Mix");
+                        ui.button("Chorus");
                         ui.button("Reverb");
-                        ui.button("?");
-                        ui.button("?");
-                        ui.button("?");
                     });
 
                 //====Change by Alex====\\

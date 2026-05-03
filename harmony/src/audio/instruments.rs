@@ -15,6 +15,7 @@ use super::envelope::EnvelopeParams;
 use super::filter::FilterPreset;
 use super::oscillator::Waveform;
 use super::voice::VoicePool;
+use super::effects::{Delay, Reverb, Chorus, EffectMode};
 
 //==========InstrumentKind==========
 
@@ -144,8 +145,11 @@ impl InstrumentEngine
         use super::effects::{Delay, Reverb};
         EffectsChain
         {
-            delay:  Delay::new(cfg.delay_ms, cfg.feedback, cfg.delay_wet, sample_rate),
+            delay: Delay::new(cfg.delay_ms, cfg.feedback, cfg.delay_wet, sample_rate),
             reverb: Reverb::new(cfg.room_size, cfg.reverb_wet),
+            chorus: Chorus::new(sample_rate),
+            mode: EffectMode::None,
+            wet_mix: 0.5,
         }
     }
 }
