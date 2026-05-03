@@ -1,4 +1,9 @@
-How to use ?
+Hello, welcome to the Harmony Music App
+Before starting, if you are on WLS for nor warning use this : 
+	$ export LIBGL_ALWAYS_SOFTWARE=1
+	$ export MESA_LOADER_DRIVER_OVERRIDE=softpipe
+
+Now, let's start !
 
 Step 1 : 
 	- Use Cargo build

@@ -10,7 +10,7 @@ pub fn config() -> Instrument
     {
         kind: InstrumentKind::Piano,
 
-        waveform: Waveform::KarplusStrong,
+        waveform: Waveform::Triangle,
 
         envelope: EnvelopeParams
         {
