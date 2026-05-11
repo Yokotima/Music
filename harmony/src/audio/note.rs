@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 /// All 88 keys of a standard piano as an enum.
 /// Each variant knows its own MIDI number and frequency.
 

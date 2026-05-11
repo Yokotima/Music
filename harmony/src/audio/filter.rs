@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 /// ## What is a biquad filter?
 ///
 /// A biquad (bi-quadratic) filter is the fundamental building block of

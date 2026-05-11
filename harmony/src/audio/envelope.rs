@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 /// ## What is an ADSR envelope?
 ///
 /// A note is not just a constant amplitude — it evolves over time.

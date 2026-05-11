@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 /// audio/instruments.rs — Structs partagés et moteur audio.
 ///
 /// Ce fichier ne contient AUCUNE valeur de paramètre sonore.
@@ -15,7 +16,7 @@ use super::envelope::EnvelopeParams;
 use super::filter::FilterPreset;
 use super::oscillator::Waveform;
 use super::voice::VoicePool;
-use super::effects::{Delay, Reverb, Chorus, EffectMode};
+use super::effects::{Chorus, EffectMode};
 
 //==========InstrumentKind==========
 

@@ -1,23 +1,4 @@
-/// This is the ONLY file the rest of the app needs to import for playing sounds.
-/// All cpal setup, sequencer wiring, and thread management is hidden inside.
-///
-/// ┌──────────────────────────────────────────────────────────────┐
-/// │  App layer (UI, game logic, tests…)                          │
-/// │                                                              │
-/// │    play(MidiNote::C4, InstrumentKind::Piano, 2.0);           │
-/// │    play_chord(&[C4, E4, G4], InstrumentKind::Piano, 1.5);    │
-/// │    play_melody(&[C4,D4,E4], InstrumentKind::Flute, 0.4, 0.05)│
-/// └──────────────────────────┬───────────────────────────────────┘
-///                            │  (this file)
-/// ┌──────────────────────────▼───────────────────────────────────┐
-/// │  play.rs  — builds stream, sequencer, track; drives cpal     │
-/// └──────────────────────────┬───────────────────────────────────┘
-///                            │
-/// ┌──────────────────────────▼───────────────────────────────────┐
-/// │  instruments.rs  /  sequencer.rs  /  voice.rs  /  …          │
-/// │  (engine internals — app never touches these directly)        │
-/// └──────────────────────────────────────────────────────────────┘
-
+#![allow(dead_code)]
 use anyhow::Result;
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{BufferSize, SampleRate, StreamConfig};
@@ -27,36 +8,37 @@ use std::time::Duration;
 use crate::sequencer::sequencer::StepSequencer;
 use super::instruments::InstrumentKind;
 use super::note::MidiNote;
+use super::effects::EffectMode;
 
 const SAMPLE_RATE: u32 = 44_100;
 const BUFFER_SIZE: u32 = 1_024;
 const DEFAULT_VELOCITY: f32 = 0.8;
 
 // play one note and block until it finishes
-pub fn play(note: MidiNote, instrument: InstrumentKind, duration_secs: f32)
+pub fn play(note: MidiNote, instrument: InstrumentKind, duration_secs: f32, effect: EffectMode)
 {
-    if let Err(e) = play_inner(&[note], instrument, duration_secs)
+    if let Err(e) = play_inner(&[note], instrument, duration_secs, effect)
     {
         eprintln!("[play] Error: {e}");
     }
 }
 
 // play multiple notes simultaneously and block until done
-pub fn play_chord(notes: &[MidiNote], instrument: InstrumentKind, duration_secs: f32)
+pub fn play_chord(notes: &[MidiNote], instrument: InstrumentKind, duration_secs: f32, effect: EffectMode)
 {
     if notes.is_empty() { return; }
-    if let Err(e) = play_inner(notes, instrument, duration_secs)
+    if let Err(e) = play_inner(notes, instrument, duration_secs, effect)
     {
         eprintln!("[play_chord] Error: {e}");
     }
 }
 
 // play notes one after another and block until done
-pub fn play_melody(notes: &[MidiNote], instrument: InstrumentKind, note_duration: f32, gap_secs: f32)
+pub fn play_melody(notes: &[MidiNote], instrument: InstrumentKind, note_duration: f32, gap_secs: f32, effect: EffectMode)
 {
     for &note in notes
     {
-        play(note, instrument, note_duration);
+        play(note, instrument, note_duration, effect);
         if gap_secs > 0.0
         {
             std::thread::sleep(Duration::from_secs_f32(gap_secs));
@@ -64,16 +46,16 @@ pub fn play_melody(notes: &[MidiNote], instrument: InstrumentKind, note_duration
     }
 }
 
-pub fn play_async(note: MidiNote, instrument: InstrumentKind, duration_secs: f32) -> std::thread::JoinHandle<()>
+pub fn play_async(note: MidiNote, instrument: InstrumentKind, duration_secs: f32, effect: EffectMode) -> std::thread::JoinHandle<()>
 {
-    std::thread::spawn(move || play(note, instrument, duration_secs))
+    std::thread::spawn(move || play(note, instrument, duration_secs, effect))
 }
 
 //==========DO NOT USE EVERYTHING AFTER TO THIS WARNING==========\\
 
 // Shared implementation for play() and play_chord().
 // Builds a cpal stream, fires note_on for every note, sleeps, then note_off.
-fn play_inner(notes: &[MidiNote], instrument: InstrumentKind, duration_secs: f32) -> Result<()>
+fn play_inner(notes: &[MidiNote], instrument: InstrumentKind, duration_secs: f32, effect: EffectMode) -> Result<()>
 {
     let seq = Arc::new(Mutex::new(StepSequencer::new(120.0, 1, SAMPLE_RATE)));
     {
@@ -81,10 +63,16 @@ fn play_inner(notes: &[MidiNote], instrument: InstrumentKind, duration_secs: f32
         let default_midi = notes.first().map(|n| n.midi()).unwrap_or(60);
         let idx = s.add_track(instrument, default_midi);
 
-        // Silence effects for clean isolated playback.
-        s.tracks[idx].engine.fx.delay.set_wet_mix(0.0);
-        s.tracks[idx].engine.fx.delay.set_feedback(0.0);
-        s.tracks[idx].engine.fx.reverb.set_wet_mix(0.0);
+        // Apply the requested effect mode and wet mix
+        s.tracks[idx].engine.fx.mode    = effect;
+        s.tracks[idx].engine.fx.wet_mix = 0.5;
+
+        // When no effect, silence delay and reverb directly
+        if effect == EffectMode::None {
+            s.tracks[idx].engine.fx.delay.set_wet_mix(0.0);
+            s.tracks[idx].engine.fx.delay.set_feedback(0.0);
+            s.tracks[idx].engine.fx.reverb.set_wet_mix(0.0);
+        }
     }
 
     let stream = build_stream(Arc::clone(&seq))?;

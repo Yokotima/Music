@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 /// ## The aliasing problem
 ///
 /// Naive waveforms like sawtooth or square have abrupt discontinuities.

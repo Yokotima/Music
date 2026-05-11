@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 //==========Circular Buffer — shared by both effects==========
 struct CircularBuffer
 {

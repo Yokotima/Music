@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 /// Signal chain per voice:
 ///   Oscillator → Filter → Envelope (amplitude) → output
 

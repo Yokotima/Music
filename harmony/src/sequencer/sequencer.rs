@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use crate::audio::instruments::{InstrumentEngine, InstrumentKind};
 
 /// Durée d'une note comme fraction d'un step.

@@ -11,5 +11,7 @@ pub mod note;
 pub mod play;
 
 //==========Instruments + Other==========\\
+#[cfg(test)]
 pub mod piano_test;
+
 pub mod config;

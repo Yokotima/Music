@@ -1,6 +1,8 @@
-use super::note::{MidiNote, ALL_NOTES};
+#![allow(dead_code)]
+use super::note::ALL_NOTES;
 use super::play::play;
 use super::instruments::InstrumentKind;
+use super::effects::EffectMode;
 
 pub fn run_all_notes()
 {
@@ -8,7 +10,7 @@ pub fn run_all_notes()
 
     for &note in &ALL_NOTES
     {
-        play(note, InstrumentKind::Piano, 0.4);
+        play(note, InstrumentKind::Piano, 0.4, EffectMode::None);
     }
 
     println!("\nAll notes played.");

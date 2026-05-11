@@ -2,9 +2,9 @@ extern crate serde;
 extern crate serde_json;
 
 use serde::{Deserialize, Serialize};
+//use core::num;
 use std::fs;
 use hound;
-use std::f32::consts::PI;
 use crate::audio::instruments::InstrumentKind;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -55,7 +55,8 @@ pub fn load_from_json(path: &str) -> Result<Project, Box<dyn std::error::Error>>
 pub fn export_to_wav(project: &Project, path: &str) -> Result<String, Box<dyn std::error::Error>> {
     //pour tt ce qui est formules et tt pour cette fonction est a verifier 
     //mais si ca marche c good alors
-    
+
+
     if !path.ends_with(".wav") 
     {
         return Err("Path must end with .wav (case sensitive)".into());
@@ -70,32 +71,54 @@ pub fn export_to_wav(project: &Project, path: &str) -> Result<String, Box<dyn st
     };
     let mut writer = hound::WavWriter::create(path, spec)?;
 
-    let step_duration = 0.5; 
+    let step_duration = 0.07; 
+    let num_samples_per_step = (step_duration * sample_rate as f32) as usize;
+    let twop = 2.0 * std::f32::consts::PI;
+    let total_steps = project.tracks.iter().map(|t| t.steps.len()).max().unwrap_or(0);
+    let total_samples = total_steps * num_samples_per_step;
+    let mut buffer = vec![0.0f32; total_samples];
 
     for track in &project.tracks
     {
-        for step in &track.steps 
+        if track.muted
         {
-            if !step.active 
-            { 
-                continue; 
-            }
-
-            if let Some(note) = step.note 
+            continue;
+        }
+        let mut phase = 0.0;
+        for (step_id, step) in track.steps.iter().enumerate()
+        {
+            if !step.active
             {
-                let freq = 440.0 * 2f32.powf((note as f32 - 69.0) / 12.0);
+                continue;
+            }
+            if let Some(note) = step.note
+            {
+                let freq = 440.0 * 2f32.powf((note as f32 - 69.0) / 12.0); 
                 let velocity = step.velocity.unwrap_or(track.default_velocity);
-
-                let num_samples = (step_duration * sample_rate as f32) as usize;
-                for i in 0..num_samples 
+                for i in 0..num_samples_per_step 
                 {
-                    let t = i as f32 / sample_rate as f32;
-                    let sample = (velocity * i16::MAX as f32 * (2.0 * PI * freq * t).sin()) as i16;
-                    writer.write_sample(sample)?;
+                    let sample_index = step_id * num_samples_per_step + i;
+                    if sample_index >= buffer.len()
+                    {
+                        break;
+                    } 
+                    let t = i as f32 / sample_rate as f32;                 
+                    buffer[sample_index] += velocity * (twop * freq * t + phase).sin();
                 }
+                phase += twop * freq * (num_samples_per_step as f32 / sample_rate as f32);                
             }
         }
     }
+    
+    //polyphonie
+
+    let mamp = buffer.iter().map(|s| s.abs()).fold(0.0f32,f32::max).max(1.0);
+
+    for sample in buffer
+    {
+        let s = (sample / mamp).clamp(-1.0, 1.0);
+        writer.write_sample((s * i16::MAX as f32) as i16)?;
+    }   
 
     writer.finalize()?;
     Ok(path.into())
