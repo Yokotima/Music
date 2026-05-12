@@ -1,5 +1,5 @@
 use eframe::egui;
-use eframe::egui::{Color32, Pos2, Rect, CornerRadius, Sense, Stroke, StrokeKind, vec2};
+use eframe::egui::{Color32, Pos2, Rect, CornerRadius, Sense, Stroke, StrokeKind, vec2, ScrollArea};
 use std::sync::{Arc, Mutex};
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -27,7 +27,7 @@ const BLACK_KEY: Color32 = Color32::from_rgb(28,28,32);
 const STEP_ON: Color32 = Color32::from_rgb(80, 160, 255);
 const STEP_OFF: Color32 = Color32::from_rgb(45, 45, 52);
 
-const STEP_COUNT: usize = 64;
+const STEP_COUNT: usize = 128;
 const SAMPLE_RATE: u32 = 44_100;
 
 type Grid = [[Option<u8>; STEP_COUNT]; 88];
@@ -139,8 +139,12 @@ impl eframe::App for MyApp {
             );
 
             self.draw_piano(ui,piano_rect);
-            self.draw_grid(ui,grid_rect);
-
+            ScrollArea::horizontal()
+                .max_width(grid_rect.width())
+                .show(ui, |ui| {
+                    ui.set_width( STEP_COUNT as f32);
+                    self.draw_grid(ui,grid_rect);
+            });
         });
     }
 }
@@ -596,7 +600,7 @@ impl MyApp {
         let n_visible = page_end - page_start;
 
         let row_h = rect.height() / n_visible as f32;
-        let col_w = rect.width() / STEP_COUNT as f32;
+        let col_w = rect.width() / 32 as f32;
 
         ui.painter().rect_filled(rect,CornerRadius::ZERO,GRID_BG);
 
