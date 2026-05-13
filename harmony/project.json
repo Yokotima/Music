@@ -1,0 +1,1303 @@
+{
+  "name": "Harmony Project",
+  "version": "1.0",
+  "description": "",
+  "tracks": [
+    {
+      "engine": "Piano",
+      "steps": [
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": true,
+          "note": 21,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        }
+      ],
+      "default_note": 21,
+      "default_velocity": 0.8,
+      "muted": false
+    },
+    {
+      "engine": "Piano",
+      "steps": [
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": true,
+          "note": 22,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        }
+      ],
+      "default_note": 22,
+      "default_velocity": 0.8,
+      "muted": false
+    }
+  ]
+}

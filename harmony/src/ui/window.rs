@@ -18,8 +18,9 @@ use crate::audio::effects::EffectMode;
 const BG: Color32 = Color32::from_rgb(18,18,20);
 const TOOLBAR_BG: Color32 = Color32::from_rgb(26,26,30);
 const PIANO_BG: Color32 = Color32::from_rgb(22,22,25);
-const GRID_BG: Color32 = Color32::from_rgb(28,28,32);
+//const GRID_BG: Color32 = Color32::from_rgb(28,28,32);
 const DIVIDER: Color32 = Color32::from_rgb(55,55,62);
+const TIME_BAR: Color32 = Color32::from_rgb(52,74,120);
 
 const WHITE_KEY: Color32 = Color32::from_rgb(238,235,230);
 const BLACK_KEY: Color32 = Color32::from_rgb(28,28,32);
@@ -143,6 +144,7 @@ impl eframe::App for MyApp {
                 .max_width(grid_rect.width())
                 .show(ui, |ui| {
                     ui.set_width( STEP_COUNT as f32);
+                    self.draw_time(ui, grid_rect);
                     self.draw_grid(ui,grid_rect);
             });
         });
@@ -595,15 +597,15 @@ impl MyApp {
     }
 
     fn draw_grid(&mut self, ui:&mut egui::Ui, rect:Rect) {
+
         let page_start = self.piano_page * NOTES_PER_PAGE;
         let page_end = (page_start + NOTES_PER_PAGE).min(88);
         let n_visible = page_end - page_start;
 
-        let row_h = rect.height() / n_visible as f32;
+        let row_h = rect.height() / (n_visible + 1) as f32;
         let col_w = rect.width() / 32 as f32;
 
-        ui.painter().rect_filled(rect,CornerRadius::ZERO,GRID_BG);
-
+        //ui.painter().rect_filled(rect,CornerRadius::ZERO,GRID_BG);
         let part: &mut Grid = match self.enum_instru {
             InstrumentKind::Piano => &mut self.part_piano,
             InstrumentKind::Flute => &mut self.part_flute,
@@ -615,7 +617,7 @@ impl MyApp {
         for row in 0..n_visible {
             let note_idx = page_start + row;
             let midi = ALL_NOTES[note_idx].midi();
-            let y = rect.min.y + row as f32 * row_h;
+            let y = rect.min.y + NAV_H + row as f32 * row_h;
 
             let row_bg = if is_black(midi) {
                 Color32::from_rgb(24, 24, 28)
@@ -658,6 +660,22 @@ impl MyApp {
                     };
                 }
             }
+        }
+        //self.draw_time(ui, rect);
+    }
+
+    fn draw_time(&mut self, ui:&mut egui::Ui, rect:Rect)
+    {
+        let x_min = rect.min.x;
+        let y_min = rect.min.y;
+        let y_max = y_min + NAV_H;
+        let nb_case_sec = 12;
+        let width = rect.width() / 32.0 * (nb_case_sec as f32);
+        for i in 0..STEP_COUNT / nb_case_sec
+        {
+            let time_rect = Rect::from_min_max(Pos2::new(x_min + (i as f32) * width + 1.2, y_min), Pos2::new(x_min + ((i + 1)as f32) * width - 1.2, y_max));
+            ui.painter().rect_filled(time_rect,CornerRadius::same(4),TIME_BAR);
+            ui.allocate_rect(time_rect, Sense::empty());
         }
     }
 }
