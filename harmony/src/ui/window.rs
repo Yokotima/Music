@@ -1,5 +1,5 @@
 use eframe::egui;
-use eframe::egui::{Color32, Pos2, Rect, CornerRadius, Sense, Stroke, StrokeKind, vec2, ScrollArea};
+use eframe::egui::{Color32, Pos2, Rect, CornerRadius, Sense, Stroke, StrokeKind, vec2};
 use std::sync::{Arc, Mutex};
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
@@ -59,6 +59,9 @@ struct MyApp {
 
     enum_effect: EffectMode,
     effect_wet: f32,
+
+    track_page: usize,
+    nb_case_sec:usize,
 }
 
 impl Default for MyApp {
@@ -79,6 +82,9 @@ impl Default for MyApp {
 
             enum_effect: EffectMode::None,
             effect_wet: 0.5,
+
+            track_page: 0,
+            nb_case_sec: 14,
         }
     }
 }
@@ -139,14 +145,10 @@ impl eframe::App for MyApp {
                 body_rect.max
             );
 
+            
+            self.draw_time(ui, grid_rect);
+            self.draw_grid(ui,grid_rect);
             self.draw_piano(ui,piano_rect);
-            ScrollArea::horizontal()
-                .max_width(grid_rect.width())
-                .show(ui, |ui| {
-                    ui.set_width( STEP_COUNT as f32);
-                    self.draw_time(ui, grid_rect);
-                    self.draw_grid(ui,grid_rect);
-            });
         });
     }
 }
@@ -244,7 +246,7 @@ impl MyApp {
                 }
 
                 ui.separator();
-                ui.label("sound test :");
+                ui.label("Sound test :");
                 if ui.button("All sound").clicked() {
                     let inst = self.enum_instru;
                     let eff = self.enum_effect;
@@ -254,6 +256,8 @@ impl MyApp {
                         }
                     });
                 }
+                ui.separator();
+                ui.label("Track");
                 if ui.button("Clear track").clicked() {
                     self.stop_playback();
                     let part: &mut Grid = match self.enum_instru {
@@ -269,6 +273,21 @@ impl MyApp {
                         }
                     }
                 }
+                if ui.button("Previous").clicked()
+                {
+                    if self.track_page > 0
+                    {
+                        self.track_page -= 1;
+                    }
+                }
+                if ui.button("  Next  "). clicked()
+                {
+                    if self.track_page < (STEP_COUNT / self.nb_case_sec) - 1
+                    {
+                        self.track_page += 1;
+                    }
+                }
+                
             });
         });
     }
@@ -631,7 +650,7 @@ impl MyApp {
             );
 
             for step_idx in 0..STEP_COUNT {
-                let x = rect.min.x + step_idx as f32 * col_w;
+                let x = rect.min.x + (step_idx as f32 - (self.nb_case_sec as f32 * self.track_page as f32)) * col_w;
                 let cell_rect = Rect::from_min_size(
                     Pos2::new(x + 1.0, y + 1.0),
                     vec2(col_w - 2.0, row_h - 2.0),
@@ -669,13 +688,23 @@ impl MyApp {
         let x_min = rect.min.x;
         let y_min = rect.min.y;
         let y_max = y_min + NAV_H;
-        let nb_case_sec = 12;
-        let width = rect.width() / 32.0 * (nb_case_sec as f32);
-        for i in 0..STEP_COUNT / nb_case_sec
+        let width = rect.width() / 32.0 * (self.nb_case_sec as f32);
+        for i in 0..STEP_COUNT / self.nb_case_sec + 1
         {
-            let time_rect = Rect::from_min_max(Pos2::new(x_min + (i as f32) * width + 1.2, y_min), Pos2::new(x_min + ((i + 1)as f32) * width - 1.2, y_max));
+            let acc = i as f32;
+            let page = self.track_page as f32;
+            let pos_x_deb = x_min + ((acc - page) as f32) * width + 1.2;
+            let pos_x_end = x_min + ((acc + 1.0 - page)as f32) * width - 1.2;
+            let time_rect = Rect::from_min_max(Pos2::new(pos_x_deb , y_min), Pos2::new(pos_x_end, y_max));
             ui.painter().rect_filled(time_rect,CornerRadius::same(4),TIME_BAR);
             ui.allocate_rect(time_rect, Sense::empty());
+            ui.painter().text(
+                Pos2::new((pos_x_deb + pos_x_end)/2.0, (y_min + y_max)/2.0), 
+                egui::Align2::CENTER_CENTER,
+                i.to_string(),
+                egui::FontId::proportional((x_min * 0.4).min(8.0)),
+                Color32::WHITE,
+            );
         }
     }
 }

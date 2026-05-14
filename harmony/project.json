@@ -7,6 +7,16 @@
       "engine": "Piano",
       "steps": [
         {
+          "active": true,
+          "note": 70,
+          "velocity": null
+        },
+        {
+          "active": false,
+          "note": null,
+          "velocity": null
+        },
+        {
           "active": false,
           "note": null,
           "velocity": null
@@ -68,7 +78,7 @@
         },
         {
           "active": true,
-          "note": 21,
+          "note": 70,
           "velocity": null
         },
         {
@@ -137,138 +147,8 @@
           "velocity": null
         },
         {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
+          "active": true,
+          "note": 70,
           "velocity": null
         },
         {
@@ -337,8 +217,8 @@
           "velocity": null
         },
         {
-          "active": false,
-          "note": null,
+          "active": true,
+          "note": 70,
           "velocity": null
         },
         {
@@ -407,8 +287,8 @@
           "velocity": null
         },
         {
-          "active": false,
-          "note": null,
+          "active": true,
+          "note": 70,
           "velocity": null
         },
         {
@@ -477,8 +357,8 @@
           "velocity": null
         },
         {
-          "active": false,
-          "note": null,
+          "active": true,
+          "note": 70,
           "velocity": null
         },
         {
@@ -547,8 +427,8 @@
           "velocity": null
         },
         {
-          "active": false,
-          "note": null,
+          "active": true,
+          "note": 70,
           "velocity": null
         },
         {
@@ -617,8 +497,8 @@
           "velocity": null
         },
         {
-          "active": false,
-          "note": null,
+          "active": true,
+          "note": 70,
           "velocity": null
         },
         {
@@ -641,19 +521,6 @@
           "note": null,
           "velocity": null
         },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        }
-      ],
-      "default_note": 21,
-      "default_velocity": 0.8,
-      "muted": false
-    },
-    {
-      "engine": "Piano",
-      "steps": [
         {
           "active": false,
           "note": null,
@@ -700,8 +567,8 @@
           "velocity": null
         },
         {
-          "active": false,
-          "note": null,
+          "active": true,
+          "note": 70,
           "velocity": null
         },
         {
@@ -776,526 +643,11 @@
         },
         {
           "active": true,
-          "note": 22,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
-          "velocity": null
-        },
-        {
-          "active": false,
-          "note": null,
+          "note": 70,
           "velocity": null
         }
       ],
-      "default_note": 22,
+      "default_note": 70,
       "default_velocity": 0.8,
       "muted": false
     }
