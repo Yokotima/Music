@@ -55,9 +55,15 @@ pub fn load_from_json(path: &str) -> Result<Project, Box<dyn std::error::Error>>
 }
 
 fn build_sequencer_from_project(project: &Project) -> StepSequencer {
-    let mut seq = StepSequencer::new(1000.0, project.tracks.len(), 44100);
 
-    for (_track_idx, track) in project.tracks.iter().enumerate() 
+    let stepcpt = project.tracks.iter()
+    .map(|t| t.steps.len())
+    .max()
+    .unwrap_or(16);
+
+    let mut seq = StepSequencer::new(100.0, stepcpt, 44100);
+
+    for (track_idx, track) in project.tracks.iter().enumerate() 
     {
         if track.muted 
         {
@@ -132,6 +138,8 @@ pub fn export_to_wav(
         {
             break;
         }
+
+
 
         last_step = step;
         safety_counter += 1;
