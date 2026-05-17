@@ -63,7 +63,7 @@ fn build_sequencer_from_project(project: &Project) -> StepSequencer {
 
     let mut seq = StepSequencer::new(100.0, stepcpt, 44100);
 
-    for (track_idx, track) in project.tracks.iter().enumerate() 
+    for (_track_idx, track) in project.tracks.iter().enumerate() 
     {
         if track.muted 
         {
