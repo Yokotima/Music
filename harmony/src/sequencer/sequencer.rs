@@ -8,7 +8,7 @@ const NOTE_GATE: f32 = 0.8;
 
 pub const DEFAULT_STEP_COUNT: usize = 16;
 pub const MIN_STEPS: usize          = 1;
-pub const MAX_STEPS: usize          = 64;
+pub const MAX_STEPS: usize          = 128;
 pub const MIN_BPM: f32              = 40.0;
 pub const MAX_BPM: f32              = 300.0;
 
@@ -149,9 +149,7 @@ impl StepSequencer
     // Exemple : 120 BPM, 16 steps, 44100 Hz → 5512.5 → 5513 samples/step
     fn calc_samples_per_step(bpm: f32, step_count: usize, sample_rate: u32) -> u32
     {
-        let steps_per_beat = step_count as f32 / 4.0;
-        let beat_samples   = sample_rate as f32 * 60.0 / bpm;
-        (beat_samples / steps_per_beat).round() as u32
+        (sample_rate as f32 / 14.0).round() as u32
     }
 
     pub fn add_track(&mut self, kind: InstrumentKind, default_note: u8) -> usize
