@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HarmonyStudio — Projet S4 EPITA</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafafa; --white: #ffffff; --text: #111111; --muted: #888888;
+    --border: #e8e8e8; --accent: #6c47ff; --accent-light: #f0ecff;
+    --accent2: #00c896; --warn: #f59e0b;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; line-height: 1.6; }
+
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.2rem 4rem; background: rgba(250,250,250,0.92); backdrop-filter: blur(16px); border-bottom: 1px solid var(--border); }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.05rem; color: var(--text); text-decoration: none; }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: 13px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--text); }
+
+  #hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 4rem 4rem; }
+  .hero-tag { display: inline-flex; align-items: center; background: var(--accent-light); color: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.4rem 0.9rem; border-radius: 100px; width: fit-content; margin-bottom: 2rem; }
+  .hero-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(3.5rem, 8vw, 8rem); line-height: 1; letter-spacing: -0.03em; }
+  .hero-title .accent-word { color: var(--accent); }
+  .hero-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 4rem; margin-top: 2.5rem; }
+  .hero-desc { max-width: 420px; color: var(--muted); font-size: 15px; line-height: 1.75; }
+  .hero-desc strong { color: var(--text); font-weight: 500; }
+  .hero-stats { display: flex; gap: 2.5rem; flex-shrink: 0; }
+  .hero-stat { text-align: right; }
+  .stat-val { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.2rem; color: var(--text); line-height: 1; }
+  .stat-label { font-size: 10px; color: var(--muted); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.12em; }
+
+  section:not(#hero) { padding: 6rem 4rem; border-top: 1px solid var(--border); }
+  .section-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.5rem; }
+  .section-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.02em; margin-bottom: 3.5rem; }
+
+  .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; }
+  .team-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; transition: all 0.25s; }
+  .team-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(108,71,255,0.08); border-color: rgba(108,71,255,0.2); }
+  .card-avatar { width: 48px; height: 48px; border-radius: 12px; background: var(--accent-light); color: var(--accent); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; margin-bottom: 1.5rem; }
+  .card-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+  .card-role { display: inline-block; background: var(--accent-light); color: var(--accent); font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.25rem 0.65rem; border-radius: 100px; margin-bottom: 1rem; }
+  .card-desc { font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 1rem; }
+  .card-tasks { display: flex; flex-direction: column; gap: 0.4rem; }
+  .task-item { display: flex; align-items: center; gap: 0.5rem; font-size: 12px; color: var(--muted); }
+  .task-item::before { content: ''; width: 4px; height: 4px; background: var(--accent); border-radius: 50%; flex-shrink: 0; opacity: 0.5; }
+
+  #documents { background: var(--white); }
+  .doc-grid { display: flex; flex-direction: column; gap: 0.75rem; }
+  .doc-row { display: flex; align-items: center; justify-content: space-between; padding: 1.25rem 1.5rem; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); transition: all 0.2s; cursor: pointer; }
+  .doc-row:hover { border-color: var(--accent); background: var(--accent-light); }
+  .doc-row-left { display: flex; align-items: center; gap: 1rem; }
+  .doc-icon-wrap { width: 40px; height: 40px; border-radius: 10px; background: var(--white); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+  .doc-row:hover .doc-icon-wrap { background: var(--accent); border-color: var(--accent); }
+  .doc-row:hover .doc-icon-wrap svg { stroke: #fff; }
+  .doc-filename { font-weight: 500; font-size: 13px; margin-bottom: 0.15rem; }
+  .doc-info { font-size: 11px; color: var(--muted); }
+  .btn-dl { display: flex; align-items: center; gap: 0.5rem; background: var(--accent); color: #fff; font-size: 11px; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; border: none; cursor: pointer; transition: all 0.2s; white-space: nowrap; font-family: 'Inter', sans-serif; }
+  .btn-dl:hover { background: #5535e0; }
+  .btn-dl.done { background: var(--accent2); }
+  .github-row { text-decoration: none; color: inherit; border: 1.5px solid rgba(108,71,255,0.35) !important; background: var(--accent-light) !important; }
+  .github-row:hover { background: #e6deff !important; border-color: var(--accent) !important; transform: none; }
+  .github-icon { background: var(--white) !important; }
+  .github-row:hover .github-icon { background: var(--accent) !important; border-color: var(--accent) !important; }
+  .github-row:hover .github-icon svg { stroke: #fff; }
+  .btn-gh { display: flex; align-items: center; gap: 0.5rem; background: var(--accent); color: #fff; font-size: 11px; font-weight: 500; padding: 0.5rem 1rem; border-radius: 8px; white-space: nowrap; pointer-events: none; }
+
+  .progress-layout { display: grid; grid-template-columns: 1fr 360px; gap: 4rem; align-items: start; }
+  .phase-list { display: flex; flex-direction: column; }
+  .phase-item { display: flex; gap: 1.25rem; padding: 1.5rem 0; border-bottom: 1px solid var(--border); }
+  .p-dot { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; margin-top: 3px; }
+  .p-dot.done { background: var(--accent2); border-color: var(--accent2); }
+  .p-dot.active { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-light); }
+  .p-dot.partial { background: linear-gradient(135deg, var(--accent2) 50%, #fff 50%); border-color: var(--accent2); }
+  .p-dot.pending { background: #fff; border-color: var(--border); }
+  .phase-body { flex: 1; }
+  .phase-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+  .phase-name { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; }
+  .p-badge { font-size: 10px; font-weight: 600; padding: 0.2rem 0.6rem; border-radius: 100px; }
+  .b-done { background: rgba(0,200,150,0.12); color: var(--accent2); }
+  .b-active { background: var(--accent-light); color: var(--accent); }
+  .b-partial { background: rgba(245,158,11,0.12); color: var(--warn); }
+  .b-pending { background: var(--border); color: var(--muted); }
+  .phase-desc { font-size: 13px; color: var(--muted); line-height: 1.65; }
+  .phase-mini-bar { margin-top: 0.75rem; display: flex; align-items: center; gap: 0.75rem; }
+  .mini-bar-outer { flex: 1; height: 4px; background: var(--border); border-radius: 100px; overflow: hidden; }
+  .mini-bar-inner { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+  .mini-bar-pct { font-size: 11px; font-weight: 600; min-width: 30px; text-align: right; }
+  .pct-green { color: var(--accent2); } .pct-orange { color: var(--warn); } .pct-grey { color: var(--muted); }
+
+  .progress-card { background: var(--white); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; position: sticky; top: 100px; }
+  .p-card-label { font-size: 11px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.15em; margin-bottom: 0.4rem; }
+  .p-card-percent { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3.5rem; color: var(--accent); letter-spacing: -0.03em; line-height: 1; margin-bottom: 1rem; }
+  .p-bar-outer { height: 6px; background: var(--border); border-radius: 100px; overflow: hidden; margin-bottom: 1.75rem; }
+  .p-bar-inner { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 100px; }
+  .sout-target { display: flex; flex-direction: column; gap: 0.6rem; padding: 1rem; background: var(--bg); border-radius: 12px; border: 1px solid var(--border); margin-bottom: 1.5rem; }
+  .sout-target-title { font-size: 11px; font-weight: 600; color: var(--text); margin-bottom: 0.4rem; }
+  .sout-row { display: flex; align-items: center; justify-content: space-between; font-size: 12px; }
+  .sout-comp { color: var(--muted); }
+  .p-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+  .p-stat { background: var(--bg); padding: 1rem 1.2rem; }
+  .p-stat-val { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.3rem; color: var(--text); }
+  .p-stat-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.15rem; }
+
+ 
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: start; }
+  .about-block { display: flex; flex-direction: column; gap: 1.5rem; }
+  .about-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; }
+  .about-card-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--accent-light); color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; }
+  .about-card-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.5rem; }
+  .about-card-text { font-size: 13px; color: var(--muted); line-height: 1.75; }
+  .timeline { display: flex; flex-direction: column; }
+  .tl-item { display: flex; gap: 1.25rem; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+  .tl-item:last-child { border-bottom: none; }
+  .tl-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex-shrink: 0; margin-top: 5px; opacity: 0.4; }
+  .tl-dot.tl-done { opacity: 1; background: var(--accent2); }
+  .tl-body { flex: 1; }
+  .tl-date { font-size: 10px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.2rem; }
+  .tl-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 0.15rem; }
+  .tl-desc { font-size: 12px; color: var(--muted); }
+
+
+  .biblio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 0.75rem; }
+  .card-github { display: inline-flex; align-items: center; gap: 0.4rem; margin-top: 1.25rem; color: var(--accent); font-size: 11px; font-weight: 600; text-decoration: none; border: 1px solid rgba(108,71,255,0.3); padding: 0.35rem 0.8rem; border-radius: 8px; transition: all 0.2s; }
+  .card-github:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .biblio-item { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 1.25rem; background: var(--white); border: 1px solid var(--border); border-radius: 12px; transition: all 0.2s; }
+  .biblio-item:hover { border-color: var(--accent); background: var(--accent-light); }
+  .biblio-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.85rem; color: var(--accent); min-width: 24px; }
+  .biblio-text { font-size: 12px; color: var(--muted); line-height: 1.6; }
+  .biblio-text a { color: var(--accent); text-decoration: none; }
+  .biblio-text a:hover { text-decoration: underline; }
+  .dl-note { font-size: 12px; color: var(--muted); margin-top: 1rem; font-style: italic; }
+
+  @media (max-width: 900px) { .about-grid { grid-template-columns: 1fr; } }
+
+  footer { border-top: 1px solid var(--border); padding: 2rem 4rem; display: flex; align-items: center; justify-content: space-between; font-size: 12px; color: var(--muted); }
+  .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: var(--text); }
+  .footer-logo span { color: var(--accent); }
+
+  @media (max-width: 900px) {
+    nav, #hero, section:not(#hero), footer { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .nav-links { display: none; }
+    .progress-layout { grid-template-columns: 1fr; }
+    .progress-card { position: static; }
+    .hero-row { flex-direction: column; gap: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">Harmony<span>Studio</span></a>
+  <ul class="nav-links">
+    <li><a href="#team">Équipe</a></li>
+    <li><a href="#about">Présentation</a></li>
+    <li><a href="#documents">Documents</a></li>
+    <li><a href="#avancement">Avancement</a></li>
+    <li><a href="#biblio">Bibliographie</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-tag">Projet S4 — EPITA · 2025</div>
+  <h1 class="hero-title">Harmony<span class="accent-word">Studio</span></h1>
+  <div class="hero-row">
+    <p class="hero-desc">
+      Une <strong>DAW open-source pour Linux</strong>, développée en <strong>Rust</strong>. Synthèse sonore temps réel, séquenceur, interface graphique et export MP3 — de zéro, en cinq mois.
+    </p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="stat-val">4</div><div class="stat-label">Membres</div></div>
+      <div class="hero-stat"><div class="stat-val">5</div><div class="stat-label">Instruments</div></div>
+      <div class="hero-stat"><div class="stat-val">S1</div><div class="stat-label">Phase actuelle</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="team">
+  <p class="section-eyebrow">01 — Équipe</p>
+  <h2 class="section-title">Qui fait quoi</h2>
+  <div class="team-grid">
+
+    <div class="team-card">
+      <div class="card-avatar">AD</div>
+      <h3 class="card-name">Alexandre d'Avezac de Castera</h3>
+      <span class="card-role">Moteur Audio · DSP</span>
+      <p class="card-desc">Cœur technique du projet. Maîtrise du traitement du signal et des mathématiques associées.</p>
+      <div class="card-tasks">
+        <div class="task-item">Oscillateurs antialiasés (PolyBLEP)</div>
+        <div class="task-item">Enveloppes ADSR &amp; gestion polyphonie</div>
+        <div class="task-item">Filtres biquad, delay &amp; réverbération</div>
+      </div>
+      <a class="card-github" href="https://github.com/Yokotima" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        Yokotima
+      </a>
+    </div>
+
+    <div class="team-card">
+      <div class="card-avatar">QJ</div>
+      <h3 class="card-name">Quentin Joly</h3>
+      <span class="card-role">Séquenceur</span>
+      <p class="card-desc">Logique temporelle et structures de données pour les événements musicaux.</p>
+      <div class="card-tasks">
+        <div class="task-item">Représentation interne de la timeline</div>
+        <div class="task-item">Algorithmes de planification temporelle</div>
+        <div class="task-item">Synchronisation avec le moteur audio</div>
+        <div class="task-item">Gestion des notes MIDI-like</div>
+      </div>
+      <a class="card-github" href="https://github.com/qjoly90" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        qjoly90
+      </a>
+    </div>
+
+    <div class="team-card">
+      <div class="card-avatar">LK</div>
+      <h3 class="card-name">Léa-Angélina Kolmerschlag</h3>
+      <span class="card-role">Interface Graphique · egui</span>
+      <p class="card-desc">Expérience utilisateur avec egui (Immediate Mode GUI). Éditeurs visuels et contrôles de transport.</p>
+      <div class="card-tasks">
+        <div class="task-item">Contrôles play / pause / stop</div>
+        <div class="task-item">Visualisation de la forme d'onde</div>
+        <div class="task-item">Éditeur de timeline (soutenance finale)</div>
+        <div class="task-item">Paramètres instruments &amp; effets</div>
+      </div>
+      <a class="card-github" href="https://github.com/lakk45" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        lakk45
+      </a>
+    </div>
+
+    <div class="team-card">
+      <div class="card-avatar">HG</div>
+      <h3 class="card-name">Hugo Guyennet</h3>
+      <span class="card-role">Système de Fichiers · Audio</span>
+      <p class="card-desc">Import/export JSON (Serde), export audio WAV (hound) et robustesse des opérations I/O.</p>
+      <div class="card-tasks">
+        <div class="task-item">Export WAV via hound</div>
+        <div class="task-item">Import/export JSON via Serde</div>
+        <div class="task-item">Persistance et sauvegarde des projets</div>
+        <div class="task-item">Validation formats & gestion erreurs</div>
+      </div>
+      <a class="card-github" href="https://github.com/Ascouscous" target="_blank" rel="noopener">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        Ascouscous
+      </a>
+    </div>
+
+  </div>
+</section>
+
+<section id="about">
+  <p class="section-eyebrow">02 — Présentation</p>
+  <h2 class="section-title">Le projet en détail</h2>
+  <div class="about-grid">
+
+    <div class="about-block">
+      <div class="about-card">
+        <div class="about-card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        </div>
+        <div class="about-card-title">Historique &amp; Contexte</div>
+        <p class="about-card-text">HarmonyStudio est né d'un constat simple : les DAW (Digital Audio Workstations) existants sont fermés, lourds, et rarement disponibles nativement sur Linux. Notre projet S4 à EPITA vise à construire une alternative open-source légère, en Rust, pensée pour la performance et la transparence du code. L'idée a émergé lors du choix de sujet en janvier 2025, avec l'ambition de couvrir synthèse sonore, séquençage et interface graphique en un seul pipeline cohérent.</p>
+      </div>
+      <div class="about-card">
+        <div class="about-card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        <div class="about-card-title">Problèmes rencontrés & Solutions</div>
+        <p class="about-card-text"><strong style="color:var(--text);font-weight:500">Modèle callback cpal :</strong> la callback audio ne pouvant ni bloquer ni allouer de mémoire, toutes les structures ont dû être pré-allouées à l'initialisation, nécessitant plusieurs refactorisations.<br><br><strong style="color:var(--text);font-weight:500">Synchronisation thread audio / UI :</strong> des coupures sonores apparaissaient lors de changements de paramètres en cours de lecture. La gestion correcte du Mutex et l'ordre des opérations ont demandé plusieurs itérations.<br><br><strong style="color:var(--text);font-weight:500">Antialiasing des oscillateurs :</strong> les formes d'ondes non-sinusoïdales produisaient du repliement spectral. Résolu via l'algorithme PolyBLEP (correction polynomiale locale aux discontinuités).<br><br><strong style="color:var(--text);font-weight:500">Dépassement mémoire Windows :</strong> un buffer audio débordait après ~20 secondes de lecture. Identifié et corrigé.<br><br><strong style="color:var(--text);font-weight:500">Export audio :</strong> conversion note MIDI → fréquence et gestion temporelle des échantillons complexes. Les pistes ne sont pas encore mixées entre elles.</p>
+      </div>
+    </div>
+
+    <div class="about-block">
+      <div class="about-card">
+        <div class="about-card-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+        </div>
+        <div class="about-card-title">Chronologie de réalisation</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot tl-done"></div>
+            <div class="tl-body">
+              <div class="tl-date">17 Jan. 2026</div>
+              <div class="tl-title">Lancement du projet</div>
+              <div class="tl-desc">Définition du périmètre, choix de Rust + cpal + egui + hound.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-done"></div>
+            <div class="tl-body">
+              <div class="tl-date">Jan. – Févr. 2026</div>
+              <div class="tl-title">Moteur Audio & Synthèse</div>
+              <div class="tl-desc">Buffers circulaires, pipeline cpal, oscillateurs PolyBLEP, ADSR, polyphonie 32 voix.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-done"></div>
+            <div class="tl-body">
+              <div class="tl-date">Févr. – Mars 2026</div>
+              <div class="tl-title">Séquenceur, UI & Export WAV</div>
+              <div class="tl-desc">Step sequencer, interface egui (piano + grille), export WAV via hound, site web v1.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot tl-done"></div>
+            <div class="tl-body">
+              <div class="tl-date">23 Mars 2026</div>
+              <div class="tl-title">Soutenance 1 — Jalon intermédiaire ✓</div>
+              <div class="tl-desc">Démo live : moteur audio + synthèse + séquenceur + UI play/stop + export WAV.</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot"></div>
+            <div class="tl-body">
+              <div class="tl-date">Avr. – Mai 2026</div>
+              <div class="tl-title">Soutenance finale</div>
+              <div class="tl-desc">Export MP3, éditeur de timeline graphique, mixage multi-pistes, rendu complet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="documents">
+  <p class="section-eyebrow">03 — Documents</p>
+  <h2 class="section-title">Fichiers &amp; Ressources</h2>
+  <div class="doc-grid">
+
+    <div class="dl-section-title">Téléchargements</div>
+    <div class="doc-row" onclick="window.open('https://github.com/Yokotima/Music/raw/main/Rapport_Projet_1.pdf', '_blank')">
+      <div class="doc-row-left">
+        <div class="doc-icon-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c47ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+        </div>
+        <div>
+          <div class="doc-filename">Rapport HarmonyStudio — Soutenance 1</div>
+          <div class="doc-info">PDF · Documentation complète du projet</div>
+        </div>
+      </div>
+      <a href="https://github.com/Yokotima/Music/raw/main/Rapport_Projet_1.pdf" download="Rapport_Projet_1.pdf" class="btn-dl" onclick="event.stopPropagation()">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5.5 1v7M2 6l3.5 3.5L9 6M1 10h9"></path></svg>
+        Télécharger
+      </a>
+    </div>
+
+    <div class="doc-row" onclick="window.open('https://github.com/Yokotima/Music/raw/Quentin-Dev/harmony.zip', '_blank')">
+      <div class="doc-row-left">
+        <div class="doc-icon-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6c47ff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+        </div>
+        <div>
+          <div class="doc-filename">Version Lite — Exécutable minimal</div>
+          <div class="doc-info">ZIP · Sans dépendances superflues, prêt à l'exécution</div>
+        </div>
+      </div>
+      <a href="https://github.com/Yokotima/Music/raw/Quentin-Dev/harmony.zip" download="harmony.zip" class="btn-dl" onclick="event.stopPropagation()">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5.5 1v7M2 6l3.5 3.5L9 6M1 10h9"></path></svg>
+        Télécharger
+      </a>
+    </div>
+
+    <div style="margin-top: 2rem;" class="dl-section-title">Code source</div>
+
+    <a class="doc-row github-row" href="https://github.com/Yokotima/Music" target="_blank" rel="noopener">
+      <div class="doc-row-left">
+        <div class="doc-icon-wrap github-icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6c47ff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+        </div>
+        <div>
+          <div class="doc-filename">Yokotima / Music</div>
+          <div class="doc-info">GitHub · Code source du projet HarmonyStudio</div>
+        </div>
+      </div>
+      <span class="btn-gh">
+        <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 9L9 2M9 2H4M9 2v5"></path></svg>
+        Voir le repo
+      </span>
+    </a>
+
+  </div>
+</section>
+
+<section id="avancement">
+  <p class="section-eyebrow">04 — Avancement</p>
+  <h2 class="section-title">État du projet</h2>
+  <div class="progress-layout">
+
+    <div class="phase-list">
+      <div class="phase-item">
+        <div class="p-dot done"></div>
+        <div class="phase-body">
+          <div class="phase-head"><span class="phase-name">Moteur Audio (DSP)</span><span class="p-badge b-done">100% — Terminé ✓</span></div>
+          <p class="phase-desc">Thread dédié, communication avec cpal (44 100 Hz, buffer 1 024 éch., stéréo), buffers circulaires stables. Architecture callback-based, toutes structures pré-allouées. Mutex Arc&lt;Mutex&lt;StepSequencer&gt;&gt; pour la communication inter-threads.</p>
+          <div class="phase-mini-bar"><div class="mini-bar-outer"><div class="mini-bar-inner" style="width:100%"></div></div><span class="mini-bar-pct pct-green">100%</span></div>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="p-dot done"></div>
+        <div class="phase-body">
+          <div class="phase-head"><span class="phase-name">Synthèse d'instruments</span><span class="p-badge b-done">100% — Terminé ✓</span></div>
+          <p class="phase-desc">Oscillateurs PolyBLEP antialiasés (sinus, dents de scie, carré, triangulaire), triple unisson ±0.2%, enveloppes ADSR exponentielles (one-pole filter), filtre biquad avec interpolation, polyphonie 32 voix avec voice stealing, effets delay + réverbération de Schroeder.</p>
+          <div class="phase-mini-bar"><div class="mini-bar-outer"><div class="mini-bar-inner" style="width:100%"></div></div><span class="mini-bar-pct pct-green">100%</span></div>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="p-dot done"></div>
+        <div class="phase-body">
+          <div class="phase-head"><span class="phase-name">Séquençage temporel</span><span class="p-badge b-done">100% — Terminé ✓</span></div>
+          <p class="phase-desc">Step sequencer sample-based synchronisé avec le moteur audio. Gestion BPM, note_on/note_off automatiques via NOTE_GATE, structures Step/Track/StepSequencer. Limitation actuelle : durée de note globale, pistes monophoniques, mixage sans normalisation.</p>
+          <div class="phase-mini-bar"><div class="mini-bar-outer"><div class="mini-bar-inner" style="width:100%"></div></div><span class="mini-bar-pct pct-green">100%</span></div>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="p-dot done"></div>
+        <div class="phase-body">
+          <div class="phase-head"><span class="phase-name">Interface Graphique (eframe/egui)</span><span class="p-badge b-done">100% — Terminé ✓</span></div>
+          <p class="phase-desc">3 zones : barre de contrôle (combo box fichiers/instrument/effet + play/stop), piano interactif 4 pages avec touches rectangulaires redimensionnables, grille de cases cochables par instrument. Alignement grille/piano et espacement à corriger.</p>
+          <div class="phase-mini-bar"><div class="mini-bar-outer"><div class="mini-bar-inner" style="width:100%"></div></div><span class="mini-bar-pct pct-green">100%</span></div>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="p-dot done"></div>
+        <div class="phase-body">
+          <div class="phase-head"><span class="phase-name">Système de Fichiers & Export Audio</span><span class="p-badge b-done">100% — Terminé ✓</span></div>
+          <p class="phase-desc">Export WAV via hound (note MIDI → fréquence, vélocité → amplitude). Import/export JSON via Serde pour la persistance des projets. Export MP3 différé à la soutenance finale (mp3lame-encoder). Mixage multi-pistes non encore implémenté.</p>
+          <div class="phase-mini-bar"><div class="mini-bar-outer"><div class="mini-bar-inner" style="width:100%"></div></div><span class="mini-bar-pct pct-green">100%</span></div>
+        </div>
+      </div>
+      <div class="phase-item">
+        <div class="p-dot done"></div>
+        <div class="phase-body">
+          <div class="phase-head"><span class="phase-name">Site Web</span><span class="p-badge b-done">100% — Terminé ✓</span></div>
+          <p class="phase-desc">Page d'accueil avec présentation du projet, équipe, chronologie, avancement et téléchargements. Objectif 23/03/2026 respecté pour la version 1.</p>
+          <div class="phase-mini-bar"><div class="mini-bar-outer"><div class="mini-bar-inner" style="width:100%"></div></div><span class="mini-bar-pct pct-green">100%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="progress-card">
+      <p class="p-card-label">Avancement global</p>
+      <div class="p-card-percent">100%</div>
+      <div class="p-bar-outer"><div class="p-bar-inner" style="width:100%"></div></div>
+      <div class="sout-target">
+        <div class="sout-target-title">Réel S1 vs Objectif</div>
+        <div class="sout-row"><span class="sout-comp">Moteur Audio</span><span class="mini-bar-pct pct-green">100% ✓</span></div>
+        <div class="sout-row"><span class="sout-comp">Synthèse</span><span class="mini-bar-pct pct-green">100% ✓</span></div>
+        <div class="sout-row"><span class="sout-comp">Séquenceur</span><span class="mini-bar-pct pct-green">100% ✓</span></div>
+        <div class="sout-row"><span class="sout-comp">Interface</span><span class="mini-bar-pct pct-green">100% ✓</span></div>
+        <div class="sout-row"><span class="sout-comp">Fichiers</span><span class="mini-bar-pct pct-green">100% ✓</span></div>
+        <div class="sout-row"><span class="sout-comp">Site Web</span><span class="mini-bar-pct pct-green">100% ✓</span></div>
+      </div>
+      <div class="p-stats-grid">
+        <div class="p-stat"><div class="p-stat-val">Rust</div><div class="p-stat-label">Langage</div></div>
+        <div class="p-stat"><div class="p-stat-val">Linux</div><div class="p-stat-label">Plateforme</div></div>
+        <div class="p-stat"><div class="p-stat-val">5</div><div class="p-stat-label">Instruments</div></div>
+        <div class="p-stat"><div class="p-stat-val">5 mois</div><div class="p-stat-label">Durée</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<section id="biblio">
+  <p class="section-eyebrow">06 — Bibliographie</p>
+  <h2 class="section-title">Sources & Références</h2>
+  <div class="biblio-grid">
+    <div class="biblio-item"><span class="biblio-num">1</span><div class="biblio-text">cpal – Cross-Platform Audio Library.<br><a href="https://github.com/RustAudio/cpal" target="_blank">github.com/RustAudio/cpal</a></div></div>
+    <div class="biblio-item"><span class="biblio-num">2</span><div class="biblio-text">Julius O. Smith III, <em>Introduction to Digital Filters with Audio Applications</em>, CCRMA, Stanford, 2007.<br><a href="https://ccrma.stanford.edu/~jos/filters/" target="_blank">ccrma.stanford.edu/~jos/filters/</a></div></div>
+    <div class="biblio-item"><span class="biblio-num">3</span><div class="biblio-text">Nils Jonas Norberg, <em>PolyBLEP Oscillator</em>, 2010.</div></div>
+    <div class="biblio-item"><span class="biblio-num">4</span><div class="biblio-text">minimp3 – Rust bindings.<br><a href="https://crates.io/crates/minimp3" target="_blank">crates.io/crates/minimp3</a></div></div>
+    <div class="biblio-item"><span class="biblio-num">5</span><div class="biblio-text">mp3lame-encoder – Rust bindings for LAME.<br><a href="https://crates.io/crates/mp3lame-encoder" target="_blank">crates.io/crates/mp3lame-encoder</a></div></div>
+    <div class="biblio-item"><span class="biblio-num">6</span><div class="biblio-text">egui – Immediate Mode GUI in Rust.<br><a href="https://github.com/emilk/egui" target="_blank">github.com/emilk/egui</a></div></div>
+    <div class="biblio-item"><span class="biblio-num">7</span><div class="biblio-text">ringbuf – Lock-free SPSC ring buffer.<br><a href="https://crates.io/crates/ringbuf" target="_blank">crates.io/crates/ringbuf</a></div></div>
+    <div class="biblio-item"><span class="biblio-num">8</span><div class="biblio-text">Udo Zölzer (éd.), <em>Digital Audio Effects</em>, 2e éd., Wiley, 2011.</div></div>
+  </div>
+</section>
+
+<footer>
+  <span class="footer-logo">Harmony<span>Studio</span></span>
+  <span>Projet S4 · EPITA 2025 — Alexandre · Hugo · Léa · Quentin</span>
+</footer>
+
+<script>
+  function handleDownload(row) {
+    const btn = row.querySelector('.btn-dl');
+    if (btn.classList.contains('done')) return;
+    btn.classList.add('done');
+    btn.innerHTML = '✓ Téléchargé';
+    setTimeout(() => {
+      btn.classList.remove('done');
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5.5 1v7M2 6l3.5 3.5L9 6M1 10h9"/></svg> Télécharger';
+    }, 2500);
+  }
+</script>
+
+
+</body></html>
